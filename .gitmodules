@@ -1,0 +1,3 @@
+[submodule "Detectron.pytorch"]
+	path = Detectron.pytorch
+	url = https://github.com/roytseng-tw/Detectron.pytorch
