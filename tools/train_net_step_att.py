@@ -1,3 +1,7 @@
+# Adapted by Ji Zhang, 2019
+#
+# Based on train_net.py Written by Roy Tseng
+
 """ Training script for steps_with_decay policy"""
 
 import argparse
@@ -19,16 +23,16 @@ cv2.setNumThreads(0)  # pytorch issue 1355: possible deadlock in dataloader
 
 import _init_paths  # pylint: disable=unused-import
 import nn as mynn
-import utils.net as net_utils
+import utils_rel.net_rel as net_utils_rel
 import utils.misc as misc_utils
 from core.config import cfg, cfg_from_file, cfg_from_list, assert_and_infer_cfg
-from datasets.roidb import combined_roidb_for_training
-from roi_data.loader import RoiDataLoader, MinibatchSampler, BatchSampler, collate_minibatch
-from modeling.model_builder import Generalized_RCNN
+from datasets_rel.roidb_att import combined_roidb_for_training
+from roi_data_rel.loader_att import RoiDataLoader, MinibatchSampler, BatchSampler, collate_minibatch
+from modeling_rel.model_builder_att import Generalized_RCNN
 from utils.detectron_weight_helper import load_detectron_weight
 from utils.logging import setup_logging
 from utils.timer import Timer
-from utils.training_stats import TrainingStats
+from utils_rel.training_stats_att import TrainingStats
 
 # Set up logging and load config options
 logger = setup_logging(__name__)
@@ -150,12 +154,16 @@ def main():
     else:
         raise ValueError("Need Cuda device to run !")
 
-    if args.dataset == "coco2017":
-        cfg.TRAIN.DATASETS = ('coco_2017_train',)
-        cfg.MODEL.NUM_CLASSES = 81
-    elif args.dataset == "keypoints_coco2017":
-        cfg.TRAIN.DATASETS = ('keypoints_coco_2017_train',)
-        cfg.MODEL.NUM_CLASSES = 2
+    if args.dataset == "oi_att":
+        cfg.TRAIN.DATASETS = ('oi_att_train',)
+        # cfg.MODEL.NUM_CLASSES = 62
+        cfg.MODEL.NUM_CLASSES = 58
+        cfg.MODEL.NUM_ATT_CLASSES = 5  # att, exclude background
+    elif args.dataset == "oi_att_mini":
+        cfg.TRAIN.DATASETS = ('oi_att_train_mini',)
+        # cfg.MODEL.NUM_CLASSES = 62
+        cfg.MODEL.NUM_CLASSES = 58
+        cfg.MODEL.NUM_ATT_CLASSES = 5  # att, exclude background
     else:
         raise ValueError("Unexpected args.dataset: {}".format(args.dataset))
 
@@ -257,49 +265,54 @@ def main():
 
     if cfg.CUDA:
         maskRCNN.cuda()
-
+        
     ### Optimizer ###
-    gn_param_nameset = set()
-    for name, module in maskRCNN.named_modules():
-        if isinstance(module, nn.GroupNorm):
-            gn_param_nameset.add(name+'.weight')
-            gn_param_nameset.add(name+'.bias')
+    # record backbone params, i.e., conv_body and box_head params
     gn_params = []
-    gn_param_names = []
-    bias_params = []
-    bias_param_names = []
-    nonbias_params = []
-    nonbias_param_names = []
-    nograd_param_names = []
-    for key, value in maskRCNN.named_parameters():
+    backbone_bias_params = []
+    backbone_bias_param_names = []
+    att_branch_bias_params = []
+    att_branch_bias_param_names = []
+    backbone_nonbias_params = []
+    backbone_nonbias_param_names = []
+    att_branch_nonbias_params = []
+    att_branch_nonbias_param_names = []
+    for key, value in dict(maskRCNN.named_parameters()).items():
         if value.requires_grad:
-            if 'bias' in key:
-                bias_params.append(value)
-                bias_param_names.append(key)
-            elif key in gn_param_nameset:
+            if 'gn' in key:
                 gn_params.append(value)
-                gn_param_names.append(key)
+            elif 'Conv_Body' in key or 'Box_Head' in key or 'Box_Outs' in key or 'RPN' in key:
+                if 'bias' in key:
+                    backbone_bias_params.append(value)
+                    backbone_bias_param_names.append(key)
+                else:
+                    backbone_nonbias_params.append(value)
+                    backbone_nonbias_param_names.append(key)
             else:
-                nonbias_params.append(value)
-                nonbias_param_names.append(key)
-        else:
-            nograd_param_names.append(key)
-    assert (gn_param_nameset - set(nograd_param_names) - set(bias_param_names)) == set(gn_param_names)
-
+                if 'bias' in key:
+                    att_branch_bias_params.append(value)
+                    att_branch_bias_param_names.append(key)
+                else:
+                    att_branch_nonbias_params.append(value)
+                    att_branch_nonbias_param_names.append(key)
     # Learning rate of 0 is a dummy value to be set properly at the start of training
     params = [
-        {'params': nonbias_params,
+        {'params': backbone_nonbias_params,
          'lr': 0,
          'weight_decay': cfg.SOLVER.WEIGHT_DECAY},
-        {'params': bias_params,
+        {'params': backbone_bias_params,
+         'lr': 0 * (cfg.SOLVER.BIAS_DOUBLE_LR + 1),
+         'weight_decay': cfg.SOLVER.WEIGHT_DECAY if cfg.SOLVER.BIAS_WEIGHT_DECAY else 0},
+        {'params': att_branch_nonbias_params,
+         'lr': 0,
+         'weight_decay': cfg.SOLVER.WEIGHT_DECAY},
+        {'params': att_branch_bias_params,
          'lr': 0 * (cfg.SOLVER.BIAS_DOUBLE_LR + 1),
          'weight_decay': cfg.SOLVER.WEIGHT_DECAY if cfg.SOLVER.BIAS_WEIGHT_DECAY else 0},
         {'params': gn_params,
          'lr': 0,
          'weight_decay': cfg.SOLVER.WEIGHT_DECAY_GN}
     ]
-    # names of paramerters for each paramter
-    param_names = [nonbias_param_names, bias_param_names, gn_param_names]
 
     if cfg.SOLVER.TYPE == "SGD":
         optimizer = torch.optim.SGD(params, momentum=cfg.SOLVER.MOMENTUM)
@@ -311,7 +324,7 @@ def main():
         load_name = args.load_ckpt
         logging.info("loading checkpoint %s", load_name)
         checkpoint = torch.load(load_name, map_location=lambda storage, loc: storage)
-        net_utils.load_ckpt(maskRCNN, checkpoint['model'])
+        net_utils_rel.load_ckpt_rel(maskRCNN, checkpoint['model'])
         if args.resume:
             args.start_step = checkpoint['step'] + 1
             if 'train_size' in checkpoint:  # For backward compatibility
@@ -324,8 +337,8 @@ def main():
 
             # There is a bug in optimizer.load_state_dict on Pytorch 0.3.1.
             # However it's fixed on master.
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            # misc_utils.load_optimizer_state_dict(optimizer, checkpoint['optimizer'])
+            # optimizer.load_state_dict(checkpoint['optimizer'])
+            misc_utils.load_optimizer_state_dict(optimizer, checkpoint['optimizer'])
         del checkpoint
         torch.cuda.empty_cache()
 
@@ -333,13 +346,15 @@ def main():
         logging.info("loading Detectron weights %s", args.load_detectron)
         load_detectron_weight(maskRCNN, args.load_detectron)
 
-    lr = optimizer.param_groups[0]['lr']  # lr of non-bias parameters, for commmand line outputs.
+    # lr = optimizer.param_groups[0]['lr']  # lr of non-bias parameters, for commmand line outputs.
+    lr = optimizer.param_groups[2]['lr']  # lr of non-backbone parameters, for commmand line outputs.
+    backbone_lr = optimizer.param_groups[0]['lr']  # lr of backbone parameters, for commmand line outputs.
 
     maskRCNN = mynn.DataParallel(maskRCNN, cpu_keywords=['im_info', 'roidb'],
                                  minibatch=True)
 
     ### Training Setups ###
-    args.run_name = misc_utils.get_run_name() + '_step'
+    args.run_name = misc_utils.get_run_name() + '_step_with_att_cls_v' + str(cfg.MODEL.SUBTYPE)
     output_dir = misc_utils.get_output_dir(args, args.run_name)
     args.cfg_filename = os.path.basename(args.cfg_file)
 
@@ -359,7 +374,8 @@ def main():
     ### Training Loop ###
     maskRCNN.train()
 
-    CHECKPOINT_PERIOD = int(cfg.TRAIN.SNAPSHOT_ITERS / cfg.NUM_GPUS)
+    # CHECKPOINT_PERIOD = int(cfg.TRAIN.SNAPSHOT_ITERS / cfg.NUM_GPUS)
+    CHECKPOINT_PERIOD = cfg.SOLVER.MAX_ITER / cfg.TRAIN.SNAPSHOT_FREQ
 
     # Set index for decay steps
     decay_steps_ind = None
@@ -390,12 +406,16 @@ def main():
                 else:
                     raise KeyError('Unknown SOLVER.WARM_UP_METHOD: {}'.format(method))
                 lr_new = cfg.SOLVER.BASE_LR * warmup_factor
-                net_utils.update_learning_rate(optimizer, lr, lr_new)
-                lr = optimizer.param_groups[0]['lr']
+                net_utils_rel.update_learning_rate_att(optimizer, lr, lr_new)
+                # lr = optimizer.param_groups[0]['lr']
+                lr = optimizer.param_groups[2]['lr']
+                backbone_lr = optimizer.param_groups[0]['lr']
                 assert lr == lr_new
             elif step == cfg.SOLVER.WARM_UP_ITERS:
-                net_utils.update_learning_rate(optimizer, lr, cfg.SOLVER.BASE_LR)
-                lr = optimizer.param_groups[0]['lr']
+                net_utils_rel.update_learning_rate_att(optimizer, lr, cfg.SOLVER.BASE_LR)
+                # lr = optimizer.param_groups[0]['lr']
+                lr = optimizer.param_groups[2]['lr']
+                backbone_lr = optimizer.param_groups[0]['lr']
                 assert lr == cfg.SOLVER.BASE_LR
 
             # Learning rate decay
@@ -403,8 +423,10 @@ def main():
                     step == cfg.SOLVER.STEPS[decay_steps_ind]:
                 logger.info('Decay the learning on step %d', step)
                 lr_new = lr * cfg.SOLVER.GAMMA
-                net_utils.update_learning_rate(optimizer, lr, lr_new)
-                lr = optimizer.param_groups[0]['lr']
+                net_utils_rel.update_learning_rate_att(optimizer, lr, lr_new)
+                # lr = optimizer.param_groups[0]['lr']
+                lr = optimizer.param_groups[2]['lr']
+                backbone_lr = optimizer.param_groups[0]['lr']
                 assert lr == lr_new
                 decay_steps_ind += 1
 
@@ -416,11 +438,11 @@ def main():
                 except StopIteration:
                     dataiterator = iter(dataloader)
                     input_data = next(dataiterator)
-
+                
                 for key in input_data:
                     if key != 'roidb': # roidb is a list of ndarrays with inconsistent length
                         input_data[key] = list(map(Variable, input_data[key]))
-
+                
                 net_outputs = maskRCNN(**input_data)
                 training_stats.UpdateIterStats(net_outputs, inner_iter)
                 loss = net_outputs['total_loss']
@@ -428,7 +450,7 @@ def main():
             optimizer.step()
             training_stats.IterToc()
 
-            training_stats.LogIterStats(step, lr)
+            training_stats.LogIterStats(step, lr, backbone_lr)
 
             if (step+1) % CHECKPOINT_PERIOD == 0:
                 save_ckpt(output_dir, args, step, train_size, maskRCNN, optimizer)
