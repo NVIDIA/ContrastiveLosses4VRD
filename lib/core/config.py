@@ -1,3 +1,10 @@
+# Based on Detectron.pytorch/lib/core/config.py
+# --------------------------------------------------------
+# Detectron.pytorch
+# Licensed under The MIT License [see LICENSE for details]
+# Written by roytseng-tw
+# --------------------------------------------------------
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -15,6 +22,8 @@ import torch
 import torch.nn as nn
 from torch.nn import init
 import yaml
+
+import _init_paths
 
 import nn as mynn
 from utils.collections import AttrDict
@@ -57,8 +66,13 @@ __C.TRAIN.IMS_PER_BATCH = 2
 # E.g., a common configuration is: 512 * 2 * 8 = 8192
 __C.TRAIN.BATCH_SIZE_PER_IM = 64
 
+__C.TRAIN.FG_REL_SIZE_PER_IM = 512
+__C.TRAIN.FG_ATT_SIZE_PER_IM = 512
+
 # Fraction of minibatch that is labeled foreground (i.e. class > 0)
 __C.TRAIN.FG_FRACTION = 0.25
+__C.TRAIN.FG_REL_FRACTION = 0.25
+__C.TRAIN.FG_ATT_FRACTION = 0.25
 
 # Overlap threshold for a ROI to be considered foreground (if >= FG_THRESH)
 __C.TRAIN.FG_THRESH = 0.5
@@ -86,6 +100,8 @@ __C.TRAIN.PROPOSAL_FILES = ()
 # Divide by NUM_GPUS to determine actual period (e.g., 20000/8 => 2500 iters)
 # to allow for linear training schedule scaling
 __C.TRAIN.SNAPSHOT_ITERS = 20000
+
+__C.TRAIN.SNAPSHOT_FREQ = 1
 
 # Normalize the targets (subtract empirical mean, divide by empirical stddev)
 __C.TRAIN.BBOX_NORMALIZE_TARGETS = True
@@ -159,6 +175,8 @@ __C.TRAIN.GT_MIN_AREA = -1
 # Freeze the backbone architecture during training if set to True
 __C.TRAIN.FREEZE_CONV_BODY = False
 
+__C.TRAIN.FREEZE_PRD_CONV_BODY = False
+__C.TRAIN.FREEZE_PRD_BOX_HEAD = False
 
 # ---------------------------------------------------------------------------- #
 # Data loader options
@@ -225,6 +243,12 @@ __C.TEST.DETECTIONS_PER_IM = 100
 # balance obtaining high recall with not having too many low precision
 # detections that will slow down inference post processing steps (like NMS)
 __C.TEST.SCORE_THRESH = 0.05
+
+# Used to filter out bad relationships
+__C.TEST.SPO_SCORE_THRESH = 0.00001
+# __C.TEST.SPO_SCORE_THRESH = 0
+
+__C.TEST.PRD_Ks = (1, 10, 70)
 
 # Save detection results files if True
 # If false, results files are cleaned up (they can be large) after local
@@ -385,6 +409,8 @@ __C.TEST.BBOX_VOTE.SCORING_METHOD = 'ID'
 # different methods)
 __C.TEST.BBOX_VOTE.SCORING_METHOD_BETA = 1.0
 
+__C.TEST.USE_GT_BOXES = False
+
 
 # ---------------------------------------------------------------------------- #
 # Model options
@@ -396,12 +422,107 @@ __C.MODEL = AttrDict()
 # (e.g., 'generalized_rcnn', 'mask_rcnn', ...)
 __C.MODEL.TYPE = ''
 
+__C.MODEL.SUBTYPE = 1
+
+__C.MODEL.RUN_BASELINE = False
+
+__C.MODEL.FEAT_LEVEL = 7
+
+__C.MODEL.USE_SELF_ATTN = False
+__C.MODEL.SELF_ATTN_CONCAT = False
+__C.MODEL.SELF_ATTN_ALONE = False
+__C.MODEL.SELF_ATTN_NUM_LAYERS = 1
+
+__C.MODEL.NO_FC7_RELU = False
+
+__C.MODEL.USE_FREQ_BIAS = False
+
+__C.MODEL.USE_OVLP_FILTER = False
+
+__C.MODEL.USE_SEPARATE_SO_SCORES = False
+
+__C.MODEL.USE_SPATIAL_FEAT = False
+
+__C.MODEL.USE_SEM_FEAT = False
+
+__C.MODEL.USE_C_ATTN = False
+
+__C.MODEL.USE_LOGITS_ATTN = False
+
+__C.MODEL.USE_SPO_ATTN = False
+
+__C.MODEL.USE_PRD_REG = False
+
+__C.MODEL.USE_MIN_REL_AREA = False
+
+__C.MODEL.USE_SO_ROI_ENHANCE = False
+
+__C.MODEL.USE_SIMPLE_P = False
+
+__C.MODEL.COMBINE_SCORES = False
+
+__C.MODEL.COMBINE_SCORES_ALL = False
+
+__C.MODEL.COMBINE_SCALE = 10.0
+
+__C.MODEL.ADD_SCORES_ALL = False
+
+__C.MODEL.ADD_SO_SCORES = False
+
+__C.MODEL.USE_BG = False
+
+__C.MODEL.USE_SO_LOSS_BG = False
+__C.MODEL.SO_LOSS_RATIO = 0.0
+
+__C.MODEL.USE_EMBED = False
+__C.MODEL.NORM_SCALE = 3.0
+
+__C.MODEL.UNFREEZE_DET = False
+
 # The backbone conv body to use
 __C.MODEL.CONV_BODY = ''
+__C.MODEL.USE_REL_LATERAL = False
+__C.MODEL.USE_REL_TOPDOWN = False
+__C.MODEL.USE_POSTHOC = False
+
+__C.MODEL.USE_REL_PYRAMID = False
+
+__C.MODEL.AGGREGATE_P_FEAT = False
+__C.MODEL.AGGREGATE_SPO_FEAT = False
+
+__C.MODEL.USE_REL_INTERSECT = False
+__C.MODEL.ADD_REL_INTERSECT = False
+
+__C.MODEL.USE_ALL_LEVELS = False
+
+__C.MODEL.USE_GLOBAL_ATTN = False
+__C.MODEL.USE_GLOBAL_ADAPTIVE_ATTN = False
+__C.MODEL.USE_GLOBAL_SEPARATE_ATTN = False
+
+__C.MODEL.USE_NODE_CONTRASTIVE_LOSS = False
+__C.MODEL.NODE_CONTRASTIVE_MARGIN = 0.2
+__C.MODEL.NODE_CONTRASTIVE_WEIGHT = 1.0
+
+__C.MODEL.USE_NODE_CONTRASTIVE_SO_AWARE_LOSS = False
+__C.MODEL.NODE_CONTRASTIVE_SO_AWARE_MARGIN = 0.2
+__C.MODEL.NODE_CONTRASTIVE_SO_AWARE_WEIGHT = 1.0
+
+__C.MODEL.USE_NODE_CONTRASTIVE_P_AWARE_LOSS = False
+__C.MODEL.NODE_CONTRASTIVE_P_AWARE_MARGIN = 0.2
+__C.MODEL.NODE_CONTRASTIVE_P_AWARE_WEIGHT = 1.0
+
+__C.MODEL.NODE_SAMPLE_SIZE = 128
+
+__C.MODEL.USE_SPO_AGNOSTIC_COMPENSATION = False
+
+# for AAAI
+__C.MODEL.USE_SEM_CONCAT = False
 
 # Number of classes in the dataset; must be set
 # E.g., 81 for COCO (80 foreground + 1 background)
 __C.MODEL.NUM_CLASSES = -1
+__C.MODEL.NUM_PRD_CLASSES = -1
+__C.MODEL.NUM_ATT_CLASSES = -1
 
 # Use a class agnostic bounding box regressor instead of the default per-class
 # regressor
@@ -448,7 +569,9 @@ __C.MODEL.SHARE_RES5 = False
 # Whether to load imagenet pretrained weights
 # If True, path to the weight file must be specified.
 # See: __C.RESNETS.IMAGENET_PRETRAINED_WEIGHTS
-__C.MODEL.LOAD_IMAGENET_PRETRAINED_WEIGHTS = True
+__C.MODEL.LOAD_IMAGENET_PRETRAINED_WEIGHTS = False
+__C.MODEL.LOAD_COCO_PRETRAINED_WEIGHTS = False
+__C.MODEL.LOAD_VRD_PRETRAINED_WEIGHTS = False
 
 # ---------------------------------------------------------------------------- #
 # Unsupervise Pose
@@ -539,6 +662,8 @@ __C.SOLVER.TYPE = 'SGD'
 # Base learning rate for the specified schedule
 __C.SOLVER.BASE_LR = 0.001
 
+__C.SOLVER.BACKBONE_LR_SCALAR = 0.1
+
 # Schedule type (see functions in utils.lr_policy for options)
 # E.g., 'step', 'steps_with_decay', ...
 __C.SOLVER.LR_POLICY = 'step'
@@ -619,6 +744,8 @@ __C.FAST_RCNN = AttrDict()
 # The string must match a function this is imported in modeling.model_builder
 # (e.g., 'head_builder.add_roi_2mlp_head' to specify a two hidden layer MLP)
 __C.FAST_RCNN.ROI_BOX_HEAD = ''
+
+__C.FAST_RCNN.PRD_HEAD = ''
 
 # Hidden layer dimension when using an MLP for the RoI box head
 __C.FAST_RCNN.MLP_HEAD_DIM = 1024
@@ -899,10 +1026,34 @@ __C.RESNETS.FREEZE_AT = 2
 # If start with '/', then it is treated as a absolute path.
 # Otherwise, treat as a relative path to __C.ROOT_DIR
 __C.RESNETS.IMAGENET_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.COCO_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.OI_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.OI_REL_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.OI_REL_PRD_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.OI_ATT_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.VRD_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.VRD_PRD_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.VG_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.VG_PRD_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.TO_BE_FINETUNED_WEIGHTS = ''
+__C.RESNETS.REL_PRETRAINED_WEIGHTS = ''
 
 # Use GroupNorm instead of BatchNorm
 __C.RESNETS.USE_GN = False
 
+
+__C.VGG16 = AttrDict()
+
+__C.VGG16.IMAGENET_PRETRAINED_WEIGHTS = ''
+__C.VGG16.COCO_PRETRAINED_WEIGHTS = ''
+__C.VGG16.OI_PRETRAINED_WEIGHTS = ''
+__C.VGG16.OI_REL_PRETRAINED_WEIGHTS = ''
+__C.VGG16.OI_REL_PRD_PRETRAINED_WEIGHTS = ''
+__C.VGG16.VRD_PRETRAINED_WEIGHTS = ''
+__C.VGG16.VRD_PRD_PRETRAINED_WEIGHTS = ''
+__C.VGG16.VG_PRETRAINED_WEIGHTS = ''
+__C.VGG16.VG_PRD_PRETRAINED_WEIGHTS = ''
+__C.VGG16.TO_BE_FINETUNED_WEIGHTS = ''
 
 # ---------------------------------------------------------------------------- #
 # GroupNorm options
@@ -1016,7 +1167,7 @@ def assert_and_infer_cfg(make_immutable=True):
     if __C.RPN.RPN_ON or __C.RETINANET.RETINANET_ON:
         __C.TEST.PRECOMPUTED_PROPOSALS = False
     if __C.MODEL.LOAD_IMAGENET_PRETRAINED_WEIGHTS:
-        assert __C.RESNETS.IMAGENET_PRETRAINED_WEIGHTS, \
+        assert __C.RESNETS.IMAGENET_PRETRAINED_WEIGHTS or __C.VGG16.IMAGENET_PRETRAINED_WEIGHTS, \
             "Path to the weight file must not be empty to load imagenet pertrained resnets."
     if set([__C.MRCNN.ROI_MASK_HEAD, __C.KRCNN.ROI_KEYPOINTS_HEAD]) & _SHARE_RES5_HEADS:
         __C.MODEL.SHARE_RES5 = True
@@ -1034,8 +1185,9 @@ def assert_and_infer_cfg(make_immutable=True):
 def merge_cfg_from_file(cfg_filename):
     """Load a yaml config file and merge it into the global config."""
     with open(cfg_filename, 'r') as f:
-        yaml_cfg = AttrDict(yaml.load(f))
+        yaml_cfg = AttrDict(yaml.load(f))        
     _merge_a_into_b(yaml_cfg, __C)
+
 
 cfg_from_file = merge_cfg_from_file
 
@@ -1092,7 +1244,7 @@ def _merge_a_into_b(a, b, stack=None):
         v = copy.deepcopy(v_)
         v = _decode_cfg_value(v)
         v = _check_and_coerce_cfg_value_type(v, b[k], k, full_key)
-
+        
         # Recursively merge dicts
         if isinstance(v, AttrDict):
             try:
