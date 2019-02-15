@@ -1,3 +1,5 @@
+# Adapted by Ji Zhang in 2019
+#
 # Copyright (c) 2017-present, Facebook, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,46 +30,46 @@ cimport numpy as np
 DTYPE = np.float32
 ctypedef np.float32_t DTYPE_t
 
+
 @cython.boundscheck(False)
-def bbox_overlaps(
-        np.ndarray[DTYPE_t, ndim=2] boxes,
-        np.ndarray[DTYPE_t, ndim=2] query_boxes):
+def bbox_pair_overlaps(
+        np.ndarray[DTYPE_t, ndim=2] boxes1,
+        np.ndarray[DTYPE_t, ndim=2] boxes2):
     """
     Parameters
     ----------
-    boxes: (N, 4) ndarray of float
-    query_boxes: (K, 4) ndarray of float
+    boxes1: (N, 4) ndarray of float
+    boxes2: (N, 4) ndarray of float
     Returns
     -------
-    overlaps: (N, K) ndarray of overlap between boxes and query_boxes
+    overlaps: (N,) ndarray of overlaps between each pair of boxes1 and boxes2
     """
-    cdef unsigned int N = boxes.shape[0]
-    cdef unsigned int K = query_boxes.shape[0]
-    cdef np.ndarray[DTYPE_t, ndim=2] overlaps = np.zeros((N, K), dtype=DTYPE)
+    assert boxes1.shape[0] == boxes2.shape[0]
+    cdef unsigned int N = boxes1.shape[0]
+    cdef np.ndarray[DTYPE_t, ndim=1] overlaps = np.zeros(N, dtype=DTYPE)
     cdef DTYPE_t iw, ih, box_area
     cdef DTYPE_t ua
-    cdef unsigned int k, n
+    cdef unsigned int n
     with nogil:
-        for k in range(K):
+        for n in range(N):
             box_area = (
-                (query_boxes[k, 2] - query_boxes[k, 0] + 1) *
-                (query_boxes[k, 3] - query_boxes[k, 1] + 1)
+                (boxes2[n, 2] - boxes2[n, 0] + 1) *
+                (boxes2[n, 3] - boxes2[n, 1] + 1)
             )
-            for n in range(N):
-                iw = (
-                    min(boxes[n, 2], query_boxes[k, 2]) -
-                    max(boxes[n, 0], query_boxes[k, 0]) + 1
+            iw = (
+                min(boxes1[n, 2], boxes2[n, 2]) -
+                max(boxes1[n, 0], boxes2[n, 0]) + 1
+            )
+            if iw > 0:
+                ih = (
+                    min(boxes1[n, 3], boxes2[n, 3]) -
+                    max(boxes1[n, 1], boxes2[n, 1]) + 1
                 )
-                if iw > 0:
-                    ih = (
-                        min(boxes[n, 3], query_boxes[k, 3]) -
-                        max(boxes[n, 1], query_boxes[k, 1]) + 1
+                if ih > 0:
+                    ua = float(
+                        (boxes1[n, 2] - boxes1[n, 0] + 1) *
+                        (boxes1[n, 3] - boxes1[n, 1] + 1) +
+                        box_area - iw * ih
                     )
-                    if ih > 0:
-                        ua = float(
-                            (boxes[n, 2] - boxes[n, 0] + 1) *
-                            (boxes[n, 3] - boxes[n, 1] + 1) +
-                            box_area - iw * ih
-                        )
-                        overlaps[n, k] = iw * ih / ua
+                    overlaps[n] = iw * ih / ua
     return overlaps

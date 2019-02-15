@@ -1,3 +1,5 @@
+# Adapted by Ji Zhang in 2019
+
 # Copyright (c) 2017-present, Facebook, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,18 +51,13 @@ def log_stats(stats, misc_args):
         lines = "[%s][%s][Step %d / %d]\n" % (
             misc_args.run_name, misc_args.cfg_filename, stats['iter'], cfg.SOLVER.MAX_ITER)
 
-    lines += "\t\tloss: %.6f, lr: %.6f time: %.6f, eta: %s\n" % (
-        stats['loss'], stats['lr'], stats['time'], stats['eta']
+    lines += "\t\tloss: %.6f, lr: %.6f backbone_lr: %.6f time: %.6f, eta: %s\n" % (
+        stats['loss'], stats['lr'], stats['backbone_lr'], stats['time'], stats['eta']
     )
     if stats['metrics']:
         lines += "\t\t" + ", ".join("%s: %.6f" % (k, v) for k, v in stats['metrics'].items()) + "\n"
     if stats['head_losses']:
         lines += "\t\t" + ", ".join("%s: %.6f" % (k, v) for k, v in stats['head_losses'].items()) + "\n"
-    if cfg.RPN.RPN_ON:
-        lines += "\t\t" + ", ".join("%s: %.6f" % (k, v) for k, v in stats['rpn_losses'].items()) + "\n"
-    if cfg.FPN.FPN_ON:
-        lines += "\t\t" + ", ".join("%s: %.6f" % (k, v) for k, v in stats['rpn_fpn_cls_losses'].items()) + "\n"
-        lines += "\t\t" + ", ".join("%s: %.6f" % (k, v) for k, v in stats['rpn_fpn_bbox_losses'].items()) + "\n"
     print(lines[:-1])  # remove last new line
 
 

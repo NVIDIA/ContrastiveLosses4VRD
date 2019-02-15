@@ -1,5 +1,5 @@
-#!/usr/bin/env python2
-
+# Adapted by Ji Zhang in 2019
+#
 # Copyright (c) 2017-present, Facebook, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,7 @@
 # limitations under the License.
 ##############################################################################
 
+
 """Utilities for training."""
 
 from __future__ import absolute_import
@@ -27,8 +28,8 @@ import datetime
 import numpy as np
 
 from core.config import cfg
-from utils.logging import log_stats
-from utils.logging import SmoothedValue
+from utils_rel.logging_rel import log_stats
+from utils_rel.logging_rel import SmoothedValue
 from utils.timer import Timer
 import utils.net as nu
 
@@ -172,11 +173,11 @@ class TrainingStats(object):
             setattr(self, attr_name, [])
         return mean_val
 
-    def LogIterStats(self, cur_iter, lr):
+    def LogIterStats(self, cur_iter, lr, backbone_lr):
         """Log the tracked statistics."""
         if (cur_iter % self.LOG_PERIOD == 0 or
                 cur_iter == cfg.SOLVER.MAX_ITER - 1):
-            stats = self.GetStats(cur_iter, lr)
+            stats = self.GetStats(cur_iter, lr, backbone_lr)
             log_stats(stats, self.misc_args)
             if self.tblogger:
                 self.tb_log_stats(stats, cur_iter)
@@ -191,7 +192,7 @@ class TrainingStats(object):
                 else:
                     self.tblogger.add_scalar(k, v, cur_iter)
 
-    def GetStats(self, cur_iter, lr):
+    def GetStats(self, cur_iter, lr, backbone_lr):
         eta_seconds = self.iter_timer.average_time * (
             cfg.SOLVER.MAX_ITER - cur_iter
         )
@@ -202,30 +203,15 @@ class TrainingStats(object):
             eta=eta,
             loss=self.smoothed_total_loss.GetMedianValue(),
             lr=lr,
+            backbone_lr=backbone_lr
         )
         stats['metrics'] = OrderedDict()
         for k in sorted(self.smoothed_metrics):
             stats['metrics'][k] = self.smoothed_metrics[k].GetMedianValue()
 
         head_losses = []
-        rpn_losses = []
-        rpn_fpn_cls_losses = []
-        rpn_fpn_bbox_losses = []
         for k, v in self.smoothed_losses.items():
-            toks = k.split('_')
-            if len(toks) == 2:
-                head_losses.append((k, v.GetMedianValue()))
-            elif len(toks) == 3:
-                rpn_losses.append((k, v.GetMedianValue()))
-            elif len(toks) == 4 and toks[2] == 'cls':
-                rpn_fpn_cls_losses.append((k, v.GetMedianValue()))
-            elif len(toks) == 4 and toks[2] == 'bbox':
-                rpn_fpn_bbox_losses.append((k, v.GetMedianValue()))
-            else:
-                raise ValueError("Unexpected loss key: %s" % k)
+            head_losses.append((k, v.GetMedianValue()))
         stats['head_losses'] = OrderedDict(head_losses)
-        stats['rpn_losses'] = OrderedDict(rpn_losses)
-        stats['rpn_fpn_cls_losses'] = OrderedDict(rpn_fpn_cls_losses)
-        stats['rpn_fpn_bbox_losses'] = OrderedDict(rpn_fpn_bbox_losses)
 
         return stats

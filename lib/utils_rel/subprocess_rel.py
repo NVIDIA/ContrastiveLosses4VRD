@@ -1,3 +1,5 @@
+# Adapted by Ji Zhang in 2019
+#
 # Copyright (c) 2017-present, Facebook, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +19,6 @@
 data. These are used for running multi-GPU inference. Subprocesses are used to
 avoid the GIL since inference may involve non-trivial amounts of Python code.
 """
-
-# from __future__ import absolute_import
-# from __future__ import division
-# from __future__ import print_function
-# from __future__ import unicode_literals
 
 from io import IOBase
 import logging
@@ -68,7 +65,7 @@ def process_in_parallel(
         start = subinds[i][0]
         end = subinds[i][-1] + 1
         subprocess_env['CUDA_VISIBLE_DEVICES'] = str(gpu_ind)
-        cmd = ('python {binary} --range {start} {end} --cfg {cfg_file} --set {opts} '
+        cmd = ('python3 {binary} --range {start} {end} --cfg {cfg_file} --set {opts} '
                '--output_dir {output_dir}')
         if load_ckpt is not None:
             cmd += ' --load_ckpt {load_ckpt}'
