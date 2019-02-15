@@ -1,3 +1,7 @@
+# Adapted by Ji Zhang in 2019
+#
+# Written by Roy Tseng
+
 import numpy as np
 import cv2
 
@@ -41,7 +45,25 @@ def get_minibatch(roidb):
     else:
         # Fast R-CNN like models trained on precomputed proposals
         valid = roi_data.fast_rcnn.add_fast_rcnn_blobs(blobs, im_scales, roidb)
+    # add attpn blobs
+    add_attpn_blobs(blobs, im_scales, roidb)
     return blobs, valid
+
+
+def add_attpn_blobs(blobs, im_scales, roidb):
+    
+    assert 'roidb' in blobs
+    valid_keys = ['dataset_name',
+                  'obj_boxes', 'obj_gt_classes', 'obj_gt_overlaps',
+                  'att_gt_classes', 'att_gt_overlaps', 'att_to_gt_ind_map',
+                  'width', 'height']
+    for i, e in enumerate(roidb):
+        for k in valid_keys:
+            if k in e:
+                blobs['roidb'][i][k] = e[k]
+    
+    # Always return valid=True, since RPN minibatches are valid by design
+    return True
 
 
 def _get_image_blob(roidb):

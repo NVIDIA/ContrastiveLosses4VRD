@@ -1,3 +1,7 @@
+# Adapted by Ji Zhang in 2019
+#
+# Written by Roy Tseng
+
 import math
 import numpy as np
 import numpy.random as npr
@@ -9,9 +13,8 @@ from torch.utils.data.dataloader import default_collate
 from torch._six import int_classes as _int_classes
 
 from core.config import cfg
-from roi_data.minibatch import get_minibatch
+from roi_data_rel.minibatch_rel import get_minibatch
 import utils.blob as blob_utils
-# from model.rpn.bbox_transform import bbox_transform_inv, clip_boxes
 
 
 class RoiDataLoader(data.Dataset):
@@ -46,6 +49,19 @@ class RoiDataLoader(data.Dataset):
                     if key in entry:
                         entry[key] = entry[key][valid_inds]
                 entry['segms'] = [entry['segms'][ind] for ind in valid_inds]
+            # for rel sanity check
+            sbj_gt_boxes = entry['sbj_gt_boxes']
+            obj_gt_boxes = entry['obj_gt_boxes']
+            sbj_invalid = (sbj_gt_boxes[:, 0] == sbj_gt_boxes[:, 2]) | (sbj_gt_boxes[:, 1] == sbj_gt_boxes[:, 3])
+            obj_invalid = (obj_gt_boxes[:, 0] == obj_gt_boxes[:, 2]) | (obj_gt_boxes[:, 1] == obj_gt_boxes[:, 3])
+            rel_valid = sbj_invalid | obj_invalid
+            rel_valid_inds = np.nonzero(~ rel_invalid)[0]
+            if len(rel_valid_inds) < len(sbj_gt_boxes):
+                for key in ['sbj_gt_boxes', 'sbj_gt_classes', 'obj_gt_boxes', 'obj_gt_classes', 'prd_gt_classes',
+                            'sbj_gt_overlaps', 'obj_gt_overlaps', 'prd_gt_overlaps', 'pair_to_gt_ind_map',
+                            'width', 'height']:
+                    if key in entry:
+                        entry[key] = entry[key][rel_valid_inds]
 
         blobs['roidb'] = blob_utils.serialize(blobs['roidb'])  # CHECK: maybe we can serialize in collate_fn
 

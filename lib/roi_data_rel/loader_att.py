@@ -1,3 +1,7 @@
+# Adapted by Ji Zhang in 2019
+#
+# Written by Roy Tseng
+
 import math
 import numpy as np
 import numpy.random as npr
@@ -9,9 +13,8 @@ from torch.utils.data.dataloader import default_collate
 from torch._six import int_classes as _int_classes
 
 from core.config import cfg
-from roi_data.minibatch import get_minibatch
+from roi_data_rel.minibatch_att import get_minibatch
 import utils.blob as blob_utils
-# from model.rpn.bbox_transform import bbox_transform_inv, clip_boxes
 
 
 class RoiDataLoader(data.Dataset):
@@ -46,6 +49,16 @@ class RoiDataLoader(data.Dataset):
                     if key in entry:
                         entry[key] = entry[key][valid_inds]
                 entry['segms'] = [entry['segms'][ind] for ind in valid_inds]
+            # for att sanity check
+            obj_boxes = entry['obj_boxes']
+            obj_invalid = (obj_boxes[:, 0] == obj_boxes[:, 2]) | (obj_boxes[:, 1] == obj_boxes[:, 3])
+            obj_valid_inds = np.nonzero(~ obj_invalid)[0]
+            if len(obj_valid_inds) < len(obj_boxes):
+                for key in ['obj_boxes', 'obj_gt_classes', 'obj_gt_overlaps',
+                            'att_gt_classes', 'att_gt_overlaps', 'att_to_gt_ind_map',
+                            'width', 'height']:
+                    if key in entry:
+                        entry[key] = entry[key][obj_valid_inds]
 
         blobs['roidb'] = blob_utils.serialize(blobs['roidb'])  # CHECK: maybe we can serialize in collate_fn
 
