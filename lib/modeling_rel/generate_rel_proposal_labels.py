@@ -1,5 +1,5 @@
-# Adapted by Ji Zhang in 2019
-# Written by Roy Tseng
+# Adapted from Detectron.pytorch/lib/modeling/generate_proposal_labels.py
+# for this project by Ji Zhang, 2019
 
 from torch import nn
 

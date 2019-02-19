@@ -1,5 +1,5 @@
-# Adapted by Ji Zhang in 2019
-# Written by Roy Tseng
+# Adapted from Detectron.pytorch/lib/modeling/model_builder.py
+# for this project by Ji Zhang, 2019
 
 from functools import wraps
 import importlib

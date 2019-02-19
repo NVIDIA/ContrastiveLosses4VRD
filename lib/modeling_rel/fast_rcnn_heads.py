@@ -1,3 +1,6 @@
+# Adapted from Detectron.pytorch/lib/modeling/fast_rcnn_heads.py
+# for this project by Ji Zhang, 2019
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -100,10 +103,10 @@ class roi_2mlp_head(nn.Module):
         }
         return detectron_weight_mapping, []
 
-    def forward(self, x, rpn_ret):
+    def forward(self, x, rpn_ret, rois_name='rois', use_relu=True):
         x = self.roi_xform(
             x, rpn_ret,
-            blob_rois='rois',
+            blob_rois=rois_name,
             method=cfg.FAST_RCNN.ROI_XFORM_METHOD,
             resolution=cfg.FAST_RCNN.ROI_XFORM_RESOLUTION,
             spatial_scale=self.spatial_scale,
@@ -111,7 +114,10 @@ class roi_2mlp_head(nn.Module):
         )
         batch_size = x.size(0)
         x = F.relu(self.fc1(x.view(batch_size, -1)), inplace=True)
-        x = F.relu(self.fc2(x), inplace=True)
+        if use_relu:
+            x = F.relu(self.fc2(x), inplace=True)
+        else:
+            x = self.fc2(x)
 
         return x
 
