@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # This module is adapted from Rowan Zellers:
 # https://github.com/rowanz/neural-motifs/blob/master/lib/sparse_targets.py
-# Modified properly for this project
+# Modified for this project
 class FrequencyBias(nn.Module):
     """
     The goal of this is to provide a simplified way of computing
