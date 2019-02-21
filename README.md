@@ -1,13 +1,20 @@
 # Graphical Contrastive Losses for Scene Graph Generation
 
 ## Setup
+
 ## Annotations
 
-[OpenImages](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n)
+create a data folder under the repo:
+```
+cd $ROOT
+mkdir data
+```
 
-[Visual Genome](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad)
+Download annotations for [OpenImages](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n).
 
-[Visual Relation Detection](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6)
+Download annotations for [Visual Genome](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad).
+
+Download annotations for [Visual Relation Detection](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6).
 
 ## Detection Models
 [here](https://drive.google.com/open?id=1_7Qw8oqDvmMpp9cBCkUZY7PByH6iINOl)
