@@ -2,8 +2,9 @@
 
 ## Annotations
 
-Create a data folder under the repo:
+Create a data folder at the top-level directory of the repository:
 ```
+export ROOT=path/to/cloned/repository
 cd $ROOT
 mkdir data
 ```
@@ -20,7 +21,7 @@ Download it [here](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR
 ## Images
 
 ### OpenImages
-Create an folder for the training images:
+Create a folder for the training images:
 ```
 cd $ROOT/data/openimages_v4
 mkdir train
@@ -28,7 +29,7 @@ mkdir train
 Download OpenImages v4 training images from the [official page](https://storage.googleapis.com/openimages/web/download.html). **Note:** only training images are needed since our annotations will split them into a train and a validation set. Put all images in `train/`
 
 ### Visual Genome
-Create an folder for all images:
+Create a folder for all images:
 ```
 cd $ROOT/data/vg
 mkdir VG_100K
@@ -36,7 +37,7 @@ mkdir VG_100K
 Download Visual Genome images from the [official page](https://visualgenome.org/api/v0/api_home.html). Unzip all images into `VG_100K/`.
 
 ### Visual Relation Detection
-Create an folder for train and validation images:
+Create a folder for train and validation images:
 ```
 cd $ROOT/data/vrd
 mkdir train_images
