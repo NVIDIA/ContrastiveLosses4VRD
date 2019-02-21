@@ -1,8 +1,7 @@
 # Adapted by Ji Zhang, 2019
 #
-# Written by Roy Tseng
-#
-# Based on:
+# Based on Detectron.pytorch/lib/roi_data/fast_rcnn.py
+# Original license text:
 # --------------------------------------------------------
 # Copyright (c) 2017-present, Facebook, Inc.
 #
