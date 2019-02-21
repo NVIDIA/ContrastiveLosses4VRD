@@ -1,3 +1,7 @@
+# Adapted from Detectron.pytorch/lib/datasets/roidb.py
+# for this project by Ji Zhang, 2019
+#
+# --------------------------------------------------------
 # Copyright (c) 2017-present, Facebook, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,11 +29,9 @@ import logging
 import numpy as np
 
 import utils.boxes as box_utils
-import utils.keypoints as keypoint_utils
-import utils.segms as segm_utils
 import utils.blob as blob_utils
 from core.config import cfg
-from .json_dataset import JsonDataset
+from .json_dataset_rel import JsonDatasetRel
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,7 @@ def combined_roidb_for_training(dataset_names, proposal_files):
     which involves caching certain types of metadata for each roidb entry.
     """
     def get_roidb(dataset_name, proposal_file):
-        ds = JsonDataset(dataset_name)
+        ds = JsonDatasetRel(dataset_name)
         roidb = ds.get_roidb(
             gt=True,
             proposal_file=proposal_file,
@@ -97,20 +99,29 @@ def extend_with_flipped_entries(roidb, dataset):
         boxes[:, 0] = width - oldx2 - 1
         boxes[:, 2] = width - oldx1 - 1
         assert (boxes[:, 2] >= boxes[:, 0]).all()
+        # sbj
+        sbj_gt_boxes = entry['sbj_gt_boxes'].copy()
+        oldx1 = sbj_gt_boxes[:, 0].copy()
+        oldx2 = sbj_gt_boxes[:, 2].copy()
+        sbj_gt_boxes[:, 0] = width - oldx2 - 1
+        sbj_gt_boxes[:, 2] = width - oldx1 - 1
+        assert (sbj_gt_boxes[:, 2] >= sbj_gt_boxes[:, 0]).all()
+        # obj
+        obj_gt_boxes = entry['obj_gt_boxes'].copy()
+        oldx1 = obj_gt_boxes[:, 0].copy()
+        oldx2 = obj_gt_boxes[:, 2].copy()
+        obj_gt_boxes[:, 0] = width - oldx2 - 1
+        obj_gt_boxes[:, 2] = width - oldx1 - 1
+        assert (obj_gt_boxes[:, 2] >= obj_gt_boxes[:, 0]).all()
+        # now flip
         flipped_entry = {}
-        dont_copy = ('boxes', 'segms', 'gt_keypoints', 'flipped')
+        dont_copy = ('boxes', 'sbj_gt_boxes', 'obj_gt_boxes', 'segms', 'gt_keypoints', 'flipped')
         for k, v in entry.items():
             if k not in dont_copy:
                 flipped_entry[k] = v
         flipped_entry['boxes'] = boxes
-        flipped_entry['segms'] = segm_utils.flip_segms(
-            entry['segms'], entry['height'], entry['width']
-        )
-        if dataset.keypoints is not None:
-            flipped_entry['gt_keypoints'] = keypoint_utils.flip_keypoints(
-                dataset.keypoints, dataset.keypoint_flip_map,
-                entry['gt_keypoints'], entry['width']
-            )
+        flipped_entry['sbj_gt_boxes'] = sbj_gt_boxes
+        flipped_entry['obj_gt_boxes'] = obj_gt_boxes
         flipped_entry['flipped'] = True
         flipped_roidb.append(flipped_entry)
     roidb.extend(flipped_roidb)
