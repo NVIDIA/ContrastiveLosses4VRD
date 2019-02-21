@@ -34,7 +34,7 @@ Create a folder for all images:
 cd $ROOT/data/vg
 mkdir VG_100K
 ```
-Download Visual Genome images from the [official page](https://visualgenome.org/api/v0/api_home.html). Unzip all images into `VG_100K/`.
+Download Visual Genome images from the [official page](https://visualgenome.org/api/v0/api_home.html). Unzip all images (part 1 and part 2) into `VG_100K/`. There should be a total of 108249 files.
 
 ### Visual Relation Detection
 Create a folder for train and validation images:
