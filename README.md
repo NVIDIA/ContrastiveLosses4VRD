@@ -1,7 +1,5 @@
 # Graphical Contrastive Losses for Scene Graph Generation
 
-% ## Setup
-
 ## Annotations
 
 Create a data folder under the repo:
