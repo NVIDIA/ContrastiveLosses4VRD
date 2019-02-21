@@ -1,5 +1,9 @@
-# Adapted by Ji Zhang in 2019
+# Adapted by Ji Zhang in 2019 for this project
+# Based on Detectron.pytorch/lib/utils/boxes.py
 #
+# Original license text below:
+# 
+#############################################################################
 # Copyright (c) 2017-present, Facebook, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

@@ -1,6 +1,6 @@
 # Adapted by Ji Zhang in 2019
 #
-# Based on net.py written by Roy Tseng
+# Based on Detectron.pytorch/lib/utils/net.py written by Roy Tseng
 
 import logging
 import os

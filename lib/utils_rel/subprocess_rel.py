@@ -1,4 +1,8 @@
 # Adapted by Ji Zhang in 2019
+# Based on Detectron.pytorch/lib/utils/subprocess.py
+# Original license text below:
+#
+#############################################################################
 #
 # Copyright (c) 2017-present, Facebook, Inc.
 #
