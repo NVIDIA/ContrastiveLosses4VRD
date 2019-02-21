@@ -10,14 +10,14 @@ cd $ROOT
 mkdir data
 ```
 
-### OpenImages/OpenImages_mini
-Download annotations for [OpenImages](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n). Unzip it under the data folder.
+#### OpenImages/OpenImages_mini
+Download it [here](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n). Unzip it under the data folder.
 
-### Visual Genome
-Download annotations for [Visual Genome](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad). Unzip it under the data folder.
+#### Visual Genome
+Download it [here](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad). Unzip it under the data folder.
 
-### Visual Relation Detection
-Download annotations for [Visual Relation Detection](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6). Unzip it under the data folder.
+#### Visual Relation Detection
+Download it [here](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6). Unzip it under the data folder.
 
 ## Detection Models
 Download pre-trained detection models [here](https://drive.google.com/open?id=1_7Qw8oqDvmMpp9cBCkUZY7PByH6iINOl). Unzip it under the root directory.
