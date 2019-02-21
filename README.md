@@ -27,10 +27,24 @@ Create an folder for the training images:
 cd $ROOT/data/openimages_v4
 mkdir train
 ```
-Download OpenImages v4 training images from the [official page](https://storage.googleapis.com/openimages/web/download.html). Note: only training images are needed since our annotations will split them into a train and a validation set.
+Download OpenImages v4 training images from the [official page](https://storage.googleapis.com/openimages/web/download.html). **Note:** only training images are needed since our annotations will split them into a train and a validation set. Put all images in `train/`
 
 ### Visual Genome
-Download Visual Genome images from the [official page](https://visualgenome.org/api/v0/api_home.html). Unzip all images 
+Create an folder for all images:
+```
+cd $ROOT/data/vg
+mkdir VG_100K
+```
+Download Visual Genome images from the [official page](https://visualgenome.org/api/v0/api_home.html). Unzip all images into `VG_100K/`.
+
+### Visual Relation Detection
+Create an folder for train and validation images:
+```
+cd $ROOT/data/vrd
+mkdir train_images
+mkdir val_images
+```
+Download Visual Relation Detection images from the [official page](https://cs.stanford.edu/people/ranjaykrishna/vrd/). Put training images into `train_images/` and testing images into `val_images/`.
 
 ## Pre-trained Detection Models
 Download pre-trained detection models [here](https://drive.google.com/open?id=1_7Qw8oqDvmMpp9cBCkUZY7PByH6iINOl). Unzip it under the root directory.
