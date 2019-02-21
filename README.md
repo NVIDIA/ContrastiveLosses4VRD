@@ -1,6 +1,6 @@
 # Graphical Contrastive Losses for Scene Graph Generation
 
-## Setup
+% ## Setup
 
 ## Annotations
 
