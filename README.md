@@ -11,13 +11,26 @@ mkdir data
 ```
 
 ### OpenImages/OpenImages_mini
-Download it [here](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n). Unzip it under the data folder.
+Download it [here](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n). Unzip it under the data folder. You should see an `openimages_v4` folder unzipped there.
 
 ### Visual Genome
-Download it [here](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad). Unzip it under the data folder.
+Download it [here](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad). Unzip it under the data folder. You should see a `vg` folder unzipped there.
 
 ### Visual Relation Detection
-Download it [here](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6). Unzip it under the data folder.
+Download it [here](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6). Unzip it under the data folder. You should see a `vrd` folder unzipped there.
+
+## Images
+
+### OpenImages
+Create an folder for the training images:
+```
+cd $ROOT/data/openimages_v4
+mkdir train
+```
+Download OpenImages v4 training images from the [official page](https://storage.googleapis.com/openimages/web/download.html). Note: only training images are needed since our annotations will split them into a train and a validation set.
+
+### Visual Genome
+Download Visual Genome images from the [official page](https://visualgenome.org/api/v0/api_home.html). Unzip all images 
 
 ## Pre-trained Detection Models
 Download pre-trained detection models [here](https://drive.google.com/open?id=1_7Qw8oqDvmMpp9cBCkUZY7PByH6iINOl). Unzip it under the root directory.
