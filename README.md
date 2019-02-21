@@ -13,23 +13,36 @@
 [here](https://drive.google.com/open?id=1_7Qw8oqDvmMpp9cBCkUZY7PByH6iINOl)
 
 ```
-+-- _config.yml
-+-- _drafts
-|   +-- begin-with-the-crazy-ideas.textile
-|   +-- on-simplicity-in-technology.markdown
-+-- _includes
-|   +-- footer.html
-|   +-- header.html
-+-- _layouts
-|   +-- default.html
-|   +-- post.html
-+-- _posts
-|   +-- 2007-10-29-why-every-programmer-should-play-nethack.textile
-|   +-- 2009-04-26-barcamp-boston-4-roundup.textile
-+-- _data
-|   +-- members.yml
-+-- _site
-+-- index.html
+|-- detection_models
+|   |-- oi_rel
+|   |   |-- X-101-64x4d-FPN
+|   |   |   |-- model_step599999.pth
+|   |-- vg
+|   |   |-- VGG16
+|   |   |   |-- model_step479999.pth
+|   |   |-- X-101-64x4d-FPN
+|   |   |   |-- model_step119999.pth
+|   |-- vrd
+|   |   |-- VGG16
+|   |   |   |-- model_step4499.pth
+|-- data
+|   |-- openimages_v4
+|   |   |-- rel
+|   |   |-- train    <-- (contains OpenImages_v4 training/validation images)
+|   |   |   |-- rel_only_annotations_train.json
+|   |   |   |-- rel_only_annotations_val.json
+|   |   |   |-- ...
+|   |-- vg
+|   |   |-- VG_100K    <-- (contains Visual Genome all images)
+|   |   |-- rel_annotations_train.json
+|   |   |-- rel_annotations_val.json
+|   |   |-- ...
+|   |-- vrd
+|   |   |-- train_images    <-- (contains Visual Relation Detection training images)
+|   |   |-- val_images    <-- (contains Visual Relation Detection validation images)
+|   |   |-- new_annotations_train.json
+|   |   |-- new_annotations_val.json
+|   |   |-- ...
 ```
 
 ## Evaluating Pre-trained models
