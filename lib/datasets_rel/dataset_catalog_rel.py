@@ -1,3 +1,6 @@
+# Adapted from Detectron.pytorch/lib/datasets/dataset_catalog.py
+# for this project by Ji Zhang,2019
+#-----------------------------------------------------------------------------
 # Copyright (c) 2017-present, Facebook, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +33,8 @@ _DATA_DIR = cfg.DATA_DIR
 # Required dataset entry keys
 IM_DIR = 'image_directory'
 ANN_FN = 'annotation_file'
+ANN_FN2 = 'annotation_file2'
+ANN_FN3 = 'predicate_file'
 
 # Optional dataset entry keys
 IM_PREFIX = 'image_prefix'
@@ -38,183 +43,139 @@ RAW_DIR = 'raw_dir'
 
 # Available datasets
 DATASETS = {
-    'cityscapes_fine_instanceonly_seg_train': {
+    # OpenImages_v4 rel dataset for relationship task
+    'oi_rel_vg_aug_train': {
         IM_DIR:
-            _DATA_DIR + '/cityscapes/images',
+            _DATA_DIR + '/openimages_v4/train',
         ANN_FN:
-            _DATA_DIR + '/cityscapes/annotations/instancesonly_gtFine_train.json',
-        RAW_DIR:
-            _DATA_DIR + '/cityscapes/raw'
+            _DATA_DIR + '/openimages_v4/rel/detections_vg_aug_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/rel_only_vg_aug_annotations_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
     },
-    'cityscapes_fine_instanceonly_seg_val': {
+    'oi_rel_train': {
         IM_DIR:
-            _DATA_DIR + '/cityscapes/images',
-        # use filtered validation as there is an issue converting contours
+            _DATA_DIR + '/openimages_v4/train',
         ANN_FN:
-            _DATA_DIR + '/cityscapes/annotations/instancesonly_filtered_gtFine_val.json',
-        RAW_DIR:
-            _DATA_DIR + '/cityscapes/raw'
+            _DATA_DIR + '/openimages_v4/rel/detections_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/rel_only_annotations_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
     },
-    'cityscapes_fine_instanceonly_seg_test': {
+    'oi_rel_train_mini': {
         IM_DIR:
-            _DATA_DIR + '/cityscapes/images',
+            _DATA_DIR + '/openimages_v4/train',
         ANN_FN:
-            _DATA_DIR + '/cityscapes/annotations/instancesonly_gtFine_test.json',
-        RAW_DIR:
-            _DATA_DIR + '/cityscapes/raw'
+            _DATA_DIR + '/openimages_v4/rel/detections_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/rel_only_annotations_train_mini.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
     },
-    'coco_2014_train': {
+    'oi_rel_val': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/train2014',
+            _DATA_DIR + '/openimages_v4/train',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/instances_train2014.json'
+            _DATA_DIR + '/openimages_v4/rel/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/rel_only_annotations_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
     },
-    'coco_2014_val': {
+    'oi_rel_val_mini': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/val2014',
+            _DATA_DIR + '/openimages_v4/train',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/instances_val2014.json'
+            _DATA_DIR + '/openimages_v4/rel/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/rel_only_annotations_val_mini.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
     },
-    'coco_2014_minival': {
+    'oi_all_rel_val': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/val2014',
+            _DATA_DIR + '/openimages_v4/train',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/instances_minival2014.json'
+            _DATA_DIR + '/openimages_v4/rel/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/all_rel_only_annotations_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
     },
-    'coco_2014_valminusminival': {
+    # for Kaggle test
+    'oi_kaggle_rel_test': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/val2014',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/instances_valminusminival2014.json'
+            _DATA_DIR + '/openimages_v4/rel/kaggle_test_images/challenge2018_test',
+        ANN_FN:  # pseudo annotation
+            _DATA_DIR + '/openimages_v4/rel/kaggle_test_images/detections_test.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/kaggle_test_images/all_rel_only_annotations_test.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
     },
-    'coco_2015_test': {
+    # VG mini
+    'vg_train_mini': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/test2015',
+            _DATA_DIR + '/vg/VG_100K',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/image_info_test2015.json'
+            _DATA_DIR + '/vg/detections_train_mini.json',
+        ANN_FN2:
+            _DATA_DIR + '/vg/rel_annotations_train_mini.json',
+        ANN_FN3:
+            _DATA_DIR + '/vg/predicates.json',
     },
-    'coco_2015_test-dev': {
+    'vg_val_mini': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/test2015',
+            _DATA_DIR + '/vg/VG_100K',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/image_info_test-dev2015.json'
+            _DATA_DIR + '/vg/detections_val_mini.json',
+        ANN_FN2:
+            _DATA_DIR + '/vg/rel_annotations_val_mini.json',
+        ANN_FN3:
+            _DATA_DIR + '/vg/predicates.json',
     },
-    'coco_2017_train': {
+    # VG dataset
+    'vg_train': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/train2017',
+            _DATA_DIR + '/vg/VG_100K',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/instances_train2017.json',
+            _DATA_DIR + '/vg/detections_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/vg/rel_annotations_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/vg/predicates.json',
     },
-    'coco_2017_val': {
+    'vg_val': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/val2017',
+            _DATA_DIR + '/vg/VG_100K',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/instances_val2017.json',
+            _DATA_DIR + '/vg/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/vg/rel_annotations_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/vg/predicates.json',
     },
-    'coco_2017_test': {  # 2017 test uses 2015 test images
+    # VRD dataset
+    'vrd_train': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/test2015',
+            _DATA_DIR + '/vrd/json_dataset/train_images',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/image_info_test2017.json',
-        IM_PREFIX:
-            'COCO_test2015_'
+            _DATA_DIR + '/vrd/json_dataset/detections_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/vrd/json_dataset/new_annotations_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/vrd/json_dataset/predicates.json',
     },
-    'coco_2017_test-dev': {  # 2017 test-dev uses 2015 test images
+    'vrd_val': {
         IM_DIR:
-            _DATA_DIR + '/coco/images/test2015',
+            _DATA_DIR + '/vrd/json_dataset/val_images',
         ANN_FN:
-            _DATA_DIR + '/coco/annotations/image_info_test-dev2017.json',
-        IM_PREFIX:
-            'COCO_test2015_'
+            _DATA_DIR + '/vrd/json_dataset/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/vrd/json_dataset/new_annotations_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/vrd/json_dataset/predicates.json',
     },
-    'coco_stuff_train': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/train2014',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/stuff_train.json'
-    },
-    'coco_stuff_val': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/val2014',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/stuff_val.json'
-    },
-    'keypoints_coco_2014_train': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/train2014',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/person_keypoints_train2014.json'
-    },
-    'keypoints_coco_2014_val': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/val2014',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/person_keypoints_val2014.json'
-    },
-    'keypoints_coco_2014_minival': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/val2014',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/person_keypoints_minival2014.json'
-    },
-    'keypoints_coco_2014_valminusminival': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/val2014',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/person_keypoints_valminusminival2014.json'
-    },
-    'keypoints_coco_2015_test': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/test2015',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/image_info_test2015.json'
-    },
-    'keypoints_coco_2015_test-dev': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/test2015',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/image_info_test-dev2015.json'
-    },
-    'keypoints_coco_2017_train': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/train2017',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/person_keypoints_train2017.json'
-    },
-    'keypoints_coco_2017_val': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/val2017',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/person_keypoints_val2017.json'
-    },
-    'keypoints_coco_2017_test': {
-        IM_DIR:
-            _DATA_DIR + '/coco/images/test2017',
-        ANN_FN:
-            _DATA_DIR + '/coco/annotations/image_info_test2017.json'
-    },
-    'voc_2007_trainval': {
-        IM_DIR:
-            _DATA_DIR + '/VOC2007/JPEGImages',
-        ANN_FN:
-            _DATA_DIR + '/VOC2007/annotations/voc_2007_trainval.json',
-        DEVKIT_DIR:
-            _DATA_DIR + '/VOC2007/VOCdevkit2007'
-    },
-    'voc_2007_test': {
-        IM_DIR:
-            _DATA_DIR + '/VOC2007/JPEGImages',
-        ANN_FN:
-            _DATA_DIR + '/VOC2007/annotations/voc_2007_test.json',
-        DEVKIT_DIR:
-            _DATA_DIR + '/VOC2007/VOCdevkit2007'
-    },
-    'voc_2012_trainval': {
-        IM_DIR:
-            _DATA_DIR + '/VOC2012/JPEGImages',
-        ANN_FN:
-            _DATA_DIR + '/VOC2012/annotations/voc_2012_trainval.json',
-        DEVKIT_DIR:
-            _DATA_DIR + '/VOC2012/VOCdevkit2012'
-    }
 }

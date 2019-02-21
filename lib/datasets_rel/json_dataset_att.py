@@ -1,3 +1,6 @@
+# Adapted from Detectron.pytorch/lib/datasets/json_dataset.py
+# for this project by Ji Zhang,2019
+#-----------------------------------------------------------------------------
 # Copyright (c) 2017-present, Facebook, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +34,7 @@ import logging
 import numpy as np
 import os
 import scipy.sparse
+import json
 
 # Must happen before importing COCO API (which imports matplotlib)
 import utils.env as envu
@@ -42,15 +46,17 @@ from pycocotools.coco import COCO
 import utils.boxes as box_utils
 from core.config import cfg
 from utils.timer import Timer
-from .dataset_catalog import ANN_FN
-from .dataset_catalog import DATASETS
-from .dataset_catalog import IM_DIR
-from .dataset_catalog import IM_PREFIX
+from .dataset_catalog_att import ANN_FN
+from .dataset_catalog_att import ANN_FN2
+from .dataset_catalog_att import ANN_FN3
+from .dataset_catalog_att import DATASETS
+from .dataset_catalog_att import IM_DIR
+from .dataset_catalog_att import IM_PREFIX
 
 logger = logging.getLogger(__name__)
 
 
-class JsonDataset(object):
+class JsonDatasetAtt(object):
     """A class representing a COCO json dataset."""
 
     def __init__(self, name):
@@ -84,12 +90,16 @@ class JsonDataset(object):
         }
         self._init_keypoints()
 
-        # # Set cfg.MODEL.NUM_CLASSES
-        # if cfg.MODEL.NUM_CLASSES != -1:
-        #     assert cfg.MODEL.NUM_CLASSES == 2 if cfg.MODEL.KEYPOINTS_ON else self.num_classes, \
-        #         "number of classes should equal when using multiple datasets"
-        # else:
-        #     cfg.MODEL.NUM_CLASSES = 2 if cfg.MODEL.KEYPOINTS_ON else self.num_classes
+        assert ANN_FN2 in DATASETS[name] and ANN_FN3 in DATASETS[name]
+        with open(DATASETS[name][ANN_FN2]) as f:
+            self.att_anns = json.load(f)
+        with open(DATASETS[name][ANN_FN3]) as f:
+            att_categories = json.load(f)
+        self.obj_classes = self.classes[1:]  # excludes background for now
+        self.num_obj_classes = len(self.obj_classes)
+        # self.att_classes = ['__background__'] + att_categories
+        self.att_classes = att_categories  # excludes background for now
+        self.num_att_classes = len(self.att_classes)
 
     @property
     def cache_path(self):
@@ -105,8 +115,11 @@ class JsonDataset(object):
         'image'(image path) and 'flipped' values are already filled on _prep_roidb_entry,
         so we don't need to overwrite it again.
         """
-        keys = ['boxes', 'segms', 'gt_classes', 'seg_areas', 'gt_overlaps',
-                'is_crowd', 'box_to_gt_ind_map']
+        keys = ['dataset_name',
+                'boxes', 'segms', 'gt_classes', 'seg_areas', 'gt_overlaps',
+                'is_crowd', 'box_to_gt_ind_map',
+                'obj_boxes', 'obj_gt_classes', 'obj_gt_overlaps',
+                'att_gt_classes', 'att_gt_overlaps', 'att_to_gt_ind_map']
         if self.keypoints is not None:
             keys += ['gt_keypoints', 'has_visible_keypoints']
         return keys
@@ -134,11 +147,17 @@ class JsonDataset(object):
             roidb = copy.deepcopy(self.COCO.loadImgs(image_ids))[:100]
         else:
             roidb = copy.deepcopy(self.COCO.loadImgs(image_ids))
+        new_roidb = []
         for entry in roidb:
-            self._prep_roidb_entry(entry)
+            # In OpenImages_v4, the detection-annotated images are more than attributes
+            # annotated images, hence the need to check
+            if entry['file_name'] in self.att_anns:
+                self._prep_roidb_entry(entry)
+                new_roidb.append(entry)
+        roidb = new_roidb
         if gt:
             # Include ground-truth object annotations
-            cache_filepath = os.path.join(self.cache_path, self.name+'_gt_roidb.pkl')
+            cache_filepath = os.path.join(self.cache_path, self.name + '_att_gt_roidb.pkl')
             if os.path.exists(cache_filepath) and not cfg.DEBUG:
                 self.debug_timer.tic()
                 self._add_gt_from_cache(roidb, cache_filepath)
@@ -149,7 +168,7 @@ class JsonDataset(object):
             else:
                 self.debug_timer.tic()
                 for entry in roidb:
-                    self._add_gt_annotations(entry)
+                    self._add_gt_annotations(entry)    
                 logger.debug(
                     '_add_gt_annotations took {:.3f}s'.
                     format(self.debug_timer.toc(average=False))
@@ -201,9 +220,20 @@ class JsonDataset(object):
                 (0, 3, self.num_keypoints), dtype=np.int32
             )
         # Remove unwanted fields that come from the json file (if they exist)
-        for k in ['date_captured', 'url', 'license', 'file_name']:
+        for k in ['date_captured', 'url', 'license']:
             if k in entry:
                 del entry[k]
+                
+        entry['dataset_name'] = ''
+                
+        # add attributes annotations
+        # att
+        entry['obj_boxes'] = np.empty((0, 4), dtype=np.float32)
+        entry['obj_gt_classes'] = np.empty((0), dtype=np.int32)
+        entry['obj_gt_overlaps'] = scipy.sparse.csr_matrix(np.empty((0, self.num_obj_classes), dtype=np.float32))
+        entry['att_gt_classes'] = np.empty((0), dtype=np.int32)
+        entry['att_gt_overlaps'] = scipy.sparse.csr_matrix(np.empty((0, self.num_att_classes), dtype=np.float32))
+        entry['att_to_gt_ind_map'] = np.empty((0), dtype=np.int32)
 
     def _add_gt_annotations(self, entry):
         """Add ground truth annotation metadata to an roidb entry."""
@@ -215,12 +245,6 @@ class JsonDataset(object):
         width = entry['width']
         height = entry['height']
         for obj in objs:
-            # crowd regions are RLE encoded and stored as dicts
-            if isinstance(obj['segmentation'], list):
-                # Valid polygons have >= 3 points, so require >= 6 coordinates
-                obj['segmentation'] = [
-                    p for p in obj['segmentation'] if len(p) >= 6
-                ]
             if obj['area'] < cfg.TRAIN.GT_MIN_AREA:
                 continue
             if 'ignore' in obj and obj['ignore'] == 1:
@@ -234,7 +258,7 @@ class JsonDataset(object):
             if obj['area'] > 0 and x2 > x1 and y2 > y1:
                 obj['clean_bbox'] = [x1, y1, x2, y2]
                 valid_objs.append(obj)
-                valid_segms.append(obj['segmentation'])
+                # valid_segms.append(obj['segmentation'])
         num_valid_objs = len(valid_objs)
 
         boxes = np.zeros((num_valid_objs, 4), dtype=entry['boxes'].dtype)
@@ -274,9 +298,6 @@ class JsonDataset(object):
                 gt_overlaps[ix, cls] = 1.0
         entry['boxes'] = np.append(entry['boxes'], boxes, axis=0)
         entry['segms'].extend(valid_segms)
-        # To match the original implementation:
-        # entry['boxes'] = np.append(
-        #     entry['boxes'], boxes.astype(np.int).astype(np.float), axis=0)
         entry['gt_classes'] = np.append(entry['gt_classes'], gt_classes)
         entry['seg_areas'] = np.append(entry['seg_areas'], seg_areas)
         entry['gt_overlaps'] = np.append(
@@ -292,6 +313,40 @@ class JsonDataset(object):
                 entry['gt_keypoints'], gt_keypoints, axis=0
             )
             entry['has_visible_keypoints'] = im_has_visible_keypoints
+            
+        entry['dataset_name'] = self.name
+
+        # add attribuste annotations
+        im_atts = self.att_anns[entry['file_name']]
+        obj_boxes = np.zeros((len(im_atts), 4), dtype=entry['obj_boxes'].dtype)
+        obj_gt_classes = np.zeros(len(im_atts), dtype=entry['obj_gt_classes'].dtype)
+        obj_gt_overlaps = np.zeros((len(im_atts), self.num_obj_classes), dtype=entry['obj_gt_overlaps'].dtype)
+        att_gt_classes = np.zeros(len(im_atts), dtype=entry['att_gt_classes'].dtype)
+        att_gt_overlaps = np.zeros((len(im_atts), self.num_att_classes), dtype=entry['att_gt_overlaps'].dtype)
+        att_to_gt_ind_map = np.zeros((len(im_atts)), dtype=entry['att_to_gt_ind_map'].dtype)
+        for ix, att in enumerate(im_atts):
+            # obj
+            obj_boxes[ix] = box_utils.y1y2x1x2_to_x1y1x2y2(att['object']['bbox'])
+            obj_gt_classes[ix] = att['object']['category']  # excludes background
+            obj_gt_overlaps[ix, obj_gt_classes[ix]] = 1.0
+            # att
+            att_gt_classes[ix] = att['attribute']  # exclude background
+            att_gt_overlaps[ix, att_gt_classes[ix]] = 1.0
+            att_to_gt_ind_map[ix] = ix
+        # obj
+        entry['obj_boxes'] = np.append(entry['obj_boxes'], obj_boxes, axis=0)
+        entry['obj_gt_classes'] = np.append(entry['obj_gt_classes'], obj_gt_classes)
+        entry['obj_gt_overlaps'] = np.append(entry['obj_gt_overlaps'].toarray(), obj_gt_overlaps, axis=0)
+        entry['obj_gt_overlaps'] = scipy.sparse.csr_matrix(entry['obj_gt_overlaps'])
+        # att
+        entry['att_gt_classes'] = np.append(entry['att_gt_classes'], att_gt_classes)
+        entry['att_gt_overlaps'] = np.append(entry['att_gt_overlaps'].toarray(), att_gt_overlaps, axis=0)
+        entry['att_gt_overlaps'] = scipy.sparse.csr_matrix(entry['att_gt_overlaps'])
+        entry['att_to_gt_ind_map'] = np.append(entry['att_to_gt_ind_map'], att_to_gt_ind_map)
+        
+        for k in ['file_name']:
+            if k in entry:
+                del entry[k]
 
     def _add_gt_from_cache(self, roidb, cache_filepath):
         """Add ground truth annotation metadata from cached file."""
@@ -303,15 +358,14 @@ class JsonDataset(object):
 
         for entry, cached_entry in zip(roidb, cached_roidb):
             values = [cached_entry[key] for key in self.valid_cached_keys]
-            boxes, segms, gt_classes, seg_areas, gt_overlaps, is_crowd, \
-                box_to_gt_ind_map = values[:7]
+            dataset_name, boxes, segms, gt_classes, seg_areas, gt_overlaps, is_crowd, box_to_gt_ind_map, \
+                obj_boxes, obj_gt_classes, obj_gt_overlaps, \
+                att_gt_classes, att_gt_overlaps, att_to_gt_ind_map = values[:len(self.valid_cached_keys)]
             if self.keypoints is not None:
-                gt_keypoints, has_visible_keypoints = values[7:]
+                gt_keypoints, has_visible_keypoints = values[len(self.valid_cached_keys):]
+            entry['dataset_name'] = dataset_name
             entry['boxes'] = np.append(entry['boxes'], boxes, axis=0)
             entry['segms'].extend(segms)
-            # To match the original implementation:
-            # entry['boxes'] = np.append(
-            #     entry['boxes'], boxes.astype(np.int).astype(np.float), axis=0)
             entry['gt_classes'] = np.append(entry['gt_classes'], gt_classes)
             entry['seg_areas'] = np.append(entry['seg_areas'], seg_areas)
             entry['gt_overlaps'] = scipy.sparse.csr_matrix(gt_overlaps)
@@ -324,6 +378,14 @@ class JsonDataset(object):
                     entry['gt_keypoints'], gt_keypoints, axis=0
                 )
                 entry['has_visible_keypoints'] = has_visible_keypoints
+                
+            # add attribute annotations
+            entry['obj_boxes'] = np.append(entry['obj_boxes'], obj_boxes, axis=0)
+            entry['obj_gt_classes'] = np.append(entry['obj_gt_classes'], obj_gt_classes)
+            entry['obj_gt_overlaps'] = scipy.sparse.csr_matrix(obj_gt_overlaps)
+            entry['att_gt_classes'] = np.append(entry['att_gt_classes'], att_gt_classes)
+            entry['att_gt_overlaps'] = scipy.sparse.csr_matrix(att_gt_overlaps)
+            entry['att_to_gt_ind_map'] = np.append(entry['att_to_gt_ind_map'], att_to_gt_ind_map)
 
     def _add_proposals_from_file(
         self, roidb, proposal_file, min_proposal_size, top_k, crowd_thresh
@@ -409,6 +471,111 @@ class JsonDataset(object):
             gt_kps[2, i] = v[i]
         return gt_kps
 
+
+def add_att_proposals(roidb, det_rois, scales):
+    """Add proposal boxes (rois) to an roidb that has ground-truth annotations
+    but no proposals. If the proposals are not at the original image scale,
+    specify the scale factor that separate them in scales.
+    """
+    obj_box_list = []
+    for i in range(len(roidb)):
+        inv_im_scale = 1. / scales[i]
+        idx = np.where(det_rois[:, 0] == i)[0]
+        obj_box_list.append(det_rois[idx, 1:] * inv_im_scale)
+        _merge_att_boxes_into_roidb(roidb, obj_box_list)
+        _add_att_class_assignments(roidb)
+    
+    
+def _merge_att_boxes_into_roidb(roidb, obj_box_list):
+    assert len(obj_box_list) == len(roidb)
+    for i, entry in enumerate(roidb):
+        obj_boxes = obj_box_list[i]
+        num_atts = obj_boxes.shape[0]
+        obj_gt_overlaps = np.zeros(
+            (num_atts, entry['obj_gt_overlaps'].shape[1]),
+            dtype=entry['obj_gt_overlaps'].dtype
+        )
+        att_gt_overlaps = np.zeros(
+            (num_atts, entry['att_gt_overlaps'].shape[1]),
+            dtype=entry['att_gt_overlaps'].dtype
+        )
+        att_to_gt_ind_map = -np.ones(
+            (num_atts), dtype=entry['att_to_gt_ind_map'].dtype
+        )
+        
+        att_gt_inds = np.arange(entry['att_gt_classes'].shape[0])
+        if len(att_gt_inds) > 0:
+            obj_gt_boxes = entry['obj_boxes'][att_gt_inds, :]
+            obj_gt_classes = entry['obj_gt_classes'][att_gt_inds]
+            att_gt_classes = entry['att_gt_classes'][att_gt_inds]
+
+            obj_to_gt_overlaps = box_utils.bbox_overlaps(
+                obj_boxes.astype(dtype=np.float32, copy=False),
+                obj_gt_boxes.astype(dtype=np.float32, copy=False)
+            )
+            # Gt box that overlaps each input box the most
+            # (ties are broken arbitrarily by class order)
+            argmaxes = obj_to_gt_overlaps.argmax(axis=1)
+            # Amount of that overlap
+            maxes = obj_to_gt_overlaps.max(axis=1)
+            # Those boxes with non-zero overlap with gt boxes
+            I = np.where(maxes >= 0)[0]  # get all items
+            # Record max overlaps with the class of the appropriate gt box
+            obj_gt_overlaps[I, obj_gt_classes[argmaxes[I]]] = maxes[I]
+            att_gt_overlaps[I, att_gt_classes[argmaxes[I]]] = maxes[I]
+            att_to_gt_ind_map[I] = att_gt_inds[argmaxes[I]]
+        entry['obj_boxes'] = np.append(
+            entry['obj_boxes'],
+            obj_boxes.astype(entry['obj_boxes'].dtype, copy=False),
+            axis=0
+        )
+        entry['obj_gt_classes'] = np.append(
+            entry['obj_gt_classes'],
+            -np.ones((num_atts), dtype=entry['obj_gt_classes'].dtype)
+        )
+        entry['obj_gt_overlaps'] = np.append(
+            entry['obj_gt_overlaps'].toarray(), obj_gt_overlaps, axis=0
+        )
+        entry['obj_gt_overlaps'] = scipy.sparse.csr_matrix(entry['obj_gt_overlaps'])
+
+        entry['att_gt_classes'] = np.append(
+            entry['att_gt_classes'],
+            -np.ones((num_atts), dtype=entry['att_gt_classes'].dtype)
+        )
+        entry['att_gt_overlaps'] = np.append(
+            entry['att_gt_overlaps'].toarray(), att_gt_overlaps, axis=0
+        )
+        entry['att_gt_overlaps'] = scipy.sparse.csr_matrix(entry['att_gt_overlaps'])
+        entry['att_to_gt_ind_map'] = np.append(
+            entry['att_to_gt_ind_map'],
+            att_to_gt_ind_map.astype(
+                entry['att_to_gt_ind_map'].dtype, copy=False
+            )
+        )
+
+
+def _add_att_class_assignments(roidb):
+    """Compute object category assignment for each box associated with each
+    roidb entry.
+    """
+    for entry in roidb:
+        obj_gt_overlaps = entry['obj_gt_overlaps'].toarray()
+        max_obj_classes = obj_gt_overlaps.argmax(axis=1)
+        entry['max_obj_classes'] = max_obj_classes
+
+        att_gt_overlaps = entry['att_gt_overlaps'].toarray()
+        max_att_overlaps = att_gt_overlaps.max(axis=1)
+        max_att_classes = att_gt_overlaps.argmax(axis=1)
+        entry['max_att_classes'] = max_att_classes
+        entry['max_att_overlaps'] = max_att_overlaps
+        # sanity checks
+        # if max overlap is 0, the class must be background (class 0)
+        # zero_inds = np.where(max_att_overlaps == 0)[0]
+        # assert all(max_att_classes[zero_inds] == 0)
+        # # if max overlap > 0, the class must be a fg class (not class 0)
+        # nonzero_inds = np.where(max_att_overlaps > 0)[0]
+        # assert all(max_att_classes[nonzero_inds] != 0)
+        
 
 def add_proposals(roidb, rois, scales, crowd_thresh):
     """Add proposal boxes (rois) to an roidb that has ground-truth annotations
