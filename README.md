@@ -18,11 +18,7 @@ The requirements are the same with [Detectron.pytorch](https://github.com/roytse
 * An NVIDAI GPU and CUDA 8.0 or higher. Some operations only have gpu implementation.
 
 ## Compilation
-1. Rename the submodule folder (otherwise it will be seen as a "pytorch" package under the "Detectron" folder):
-```
-mv Detectron.pytorch Detectron_pytorch
-```
-Compile the CUDA code inside the Detectron submodule and in the repo:
+Compile the CUDA code in the Detectron submodule and in the repo:
 ```
 cd $ROOT/Detectron_pytorch/lib
 sh make.sh
