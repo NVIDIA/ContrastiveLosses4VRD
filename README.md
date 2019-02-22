@@ -1,5 +1,19 @@
 # Graphical Contrastive Losses for Scene Graph Generation
 
+## Requirements
+* Python 3
+** pytorch 0.4.x
+** torchvision
+** cython
+** matplotlib
+** numpy
+** scipy
+** opencv
+** pyyaml
+** packaging
+** pycocotools
+** tensorboardX
+
 ## Annotations
 
 Create a data folder at the top-level directory of the repository:
