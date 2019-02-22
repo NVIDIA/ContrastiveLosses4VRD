@@ -15,7 +15,7 @@ The requirements are the same with [Detectron.pytorch](https://github.com/roytse
   * packaging
   * [pycocotools](https://github.com/cocodataset/cocoapi)
   * tensorboardX
-* An NVIDAI GPU and CUDA 8.0 or higher. Some operations only have gpu implementation.
+* An NVIDIA GPU and CUDA 8.0 or higher. Some operations only have gpu implementation.
 
 ## Compilation
 Compile the CUDA code in the Detectron submodule and in the repo:
