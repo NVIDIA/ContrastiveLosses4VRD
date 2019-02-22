@@ -1,6 +1,7 @@
 # Graphical Contrastive Losses for Scene Graph Generation
 
 ## Requirements
+The requirements are the same with [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch):
 * Python 3
 * Python packages
   * pytorch 0.4.x
@@ -12,8 +13,22 @@
   * opencv
   * pyyaml
   * packaging
-  * pycocotools
+  * [pycocotools](https://github.com/cocodataset/cocoapi)
   * tensorboardX
+* An NVIDAI GPU and CUDA 8.0 or higher. Some operations only have gpu implementation.
+
+## Compilation
+1. Rename the submodule folder (otherwise it will be seen as a "pytorch" package under the "Detectron" folder):
+```
+mv Detectron.pytorch Detectron_pytorch
+```
+Compile the CUDA code inside the Detectron submodule and in the repo:
+```
+cd $ROOT/Detectron_pytorch/lib
+sh make.sh
+cd $ROOT/lib
+sh make.sh
+```
 
 ## Annotations
 
