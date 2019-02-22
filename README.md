@@ -2,17 +2,18 @@
 
 ## Requirements
 * Python 3
-** pytorch 0.4.x
-** torchvision
-** cython
-** matplotlib
-** numpy
-** scipy
-** opencv
-** pyyaml
-** packaging
-** pycocotools
-** tensorboardX
+* Python packages
+  * pytorch 0.4.x
+  * torchvision
+  * cython
+  * matplotlib
+  * numpy
+  * scipy
+  * opencv
+  * pyyaml
+  * packaging
+  * pycocotools
+  * tensorboardX
 
 ## Annotations
 
