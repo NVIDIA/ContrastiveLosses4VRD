@@ -20,6 +20,7 @@ The requirements are the same with [Detectron.pytorch](https://github.com/roytse
 ## Compilation
 Compile the CUDA code in the Detectron submodule and in the repo:
 ```
+# ROOT=path/to/cloned/repository
 cd $ROOT/Detectron_pytorch/lib
 sh make.sh
 cd $ROOT/lib
@@ -30,7 +31,7 @@ sh make.sh
 
 Create a data folder at the top-level directory of the repository:
 ```
-export ROOT=path/to/cloned/repository
+# ROOT=path/to/cloned/repository
 cd $ROOT
 mkdir data
 ```
