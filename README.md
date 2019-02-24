@@ -37,19 +37,20 @@ mkdir data
 ```
 
 ### OpenImages/OpenImages_mini
-Download it [here](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n). Unzip it under the data folder. You should see an `openimages_v4` folder unzipped there.
+Download it [here](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n). Unzip it under the data folder. You should see an `openimages_v4` folder unzipped there. It contains .json annotation files for both OpenImages and OpenImages_mini, which is a subset of the former created by us including 4500 train and 1000 test images. The .json files are created based on the original .csv annotations.
 
 ### Visual Genome
-Download it [here](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad). Unzip it under the data folder. You should see a `vg` folder unzipped there.
+Download it [here](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad). Unzip it under the data folder. You should see a `vg` folder unzipped there. It contains .json annotations that suit the dataloader used in this repo.
 
 ### Visual Relation Detection
-Download it [here](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6). Unzip it under the data folder. You should see a `vrd` folder unzipped there.
+Download it [here](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6). Unzip it under the data folder. You should see a `vrd` folder unzipped there. It contains .json annotations that suit the dataloader used in this repo.
 
 ## Images
 
 ### OpenImages
 Create a folder for the training images:
 ```
+# ROOT=path/to/cloned/repository
 cd $ROOT/data/openimages_v4
 mkdir train
 ```
@@ -58,6 +59,7 @@ Download OpenImages v4 training images from the [official page](https://storage.
 ### Visual Genome
 Create a folder for all images:
 ```
+# ROOT=path/to/cloned/repository
 cd $ROOT/data/vg
 mkdir VG_100K
 ```
@@ -66,6 +68,7 @@ Download Visual Genome images from the [official page](https://visualgenome.org/
 ### Visual Relation Detection
 Create a folder for train and validation images:
 ```
+# ROOT=path/to/cloned/repository
 cd $ROOT/data/vrd
 mkdir train_images
 mkdir val_images
