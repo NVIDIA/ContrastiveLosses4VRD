@@ -4,7 +4,7 @@
 The requirements are the same with [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch):
 * Python 3
 * Python packages
-  * tested with pytorch 0.4.0 and 0.4.1.post2
+  * pytorch 0.4.0 or 0.4.1.post2 (both are tested)
   * torchvision
   * cython
   * matplotlib
@@ -93,11 +93,11 @@ Download the original annotation json files from [here](https://cs.stanford.edu/
 cd $ROOT
 python tools/rename_vrd_with_numbers.py
 ```
-This will 
+This script does two things: 1) convert image "2743361338_3d1a1e3b93_o.png" and "4392556686_44d71ff5a0_o.gif" to .jpg format, and rename all images to the "{:012d}.jpg" format, e.g., "000000000001.jpg". New annotations are also created accordingly which will be used by this repo. This is simply for data cleaning purpose and for consistency of the format used by our dataloader.
 
 
 ## Pre-trained Object Detection Models
-Download pre-trained object detection models [here](https://drive.google.com/open?id=1NrqOLbMa_RwHbG3KIXJFWLnlND2kiIpj). Unzip it under the root directory.
+Download pre-trained object detection models [here](https://drive.google.com/open?id=1NrqOLbMa_RwHbG3KIXJFWLnlND2kiIpj). Unzip it under the root directory. We do not include code for training object detectors. If you have such need, please refer to [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch).
 
 ## Our Trained Relationship Detection Models
 Download our trained models [here](https://drive.google.com/open?id=1mVnkZXdlg1ClVF5cGrSgQm31Q3Z0ZcNX). Unzip it under the root folder and you should see a `trained_models` folder there.
