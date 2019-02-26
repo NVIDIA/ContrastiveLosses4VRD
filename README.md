@@ -4,7 +4,7 @@
 The requirements are the same with [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch):
 * Python 3
 * Python packages
-  * pytorch 0.4.x
+  * tested with pytorch 0.4.0 and 0.4.1.post2
   * torchvision
   * cython
   * matplotlib
