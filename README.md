@@ -93,7 +93,7 @@ Download the original annotation json files from [here](https://cs.stanford.edu/
 cd $ROOT
 python tools/rename_vrd_with_numbers.py
 ```
-This script does two things: 1) convert image "2743361338_3d1a1e3b93_o.png" and "4392556686_44d71ff5a0_o.gif" to .jpg format, and rename all images to the "{:012d}.jpg" format, e.g., "000000000001.jpg". New annotations are also created accordingly which will be used by this repo. This is simply for data cleaning purpose and for consistency of the format used by our dataloader.
+This script does two things: 1) convert image "2743361338_3d1a1e3b93_o.png" and "4392556686_44d71ff5a0_o.gif" to .jpg format, and rename all images to the "{:012d}.jpg" format, e.g., "000000000001.jpg". 2) New annotations are created accordingly which will be used by this repo. This is simply for data cleaning purpose and for consistency of the format used by our dataloader.
 
 
 ## Pre-trained Object Detection Models
