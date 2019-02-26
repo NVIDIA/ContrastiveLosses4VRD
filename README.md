@@ -64,7 +64,7 @@ See [Images:VRD](#visual-relation-detection-1)
 ## Images
 
 ### OpenImages
-Create a folder for the training images:
+Create a folder `train/` for the training images:
 ```
 # ROOT=path/to/cloned/repository
 cd $ROOT/data/openimages_v4
@@ -93,7 +93,7 @@ Download the original annotation json files from [here](https://cs.stanford.edu/
 cd $ROOT
 python tools/rename_vrd_with_numbers.py
 ```
-
+This will 
 
 
 ## Pre-trained Object Detection Models
