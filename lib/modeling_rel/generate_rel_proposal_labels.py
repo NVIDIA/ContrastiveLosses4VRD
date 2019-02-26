@@ -24,11 +24,9 @@ class GenerateRelProposalLabelsOp(nn.Module):
         output_blob_names = ['sbj_rois', 'obj_rois', 'rel_rois', 'fg_prd_labels_int32', 'all_prd_labels_int32', 'fg_size']
         if cfg.MODEL.USE_SPATIAL_FEAT:
             output_blob_names += ['spt_feat']
-        if cfg.MODEL.USE_FREQ_BIAS or cfg.MODEL.USE_SEPARATE_SO_SCORES:
+        if cfg.MODEL.USE_FREQ_BIAS:
             output_blob_names += ['all_sbj_labels_int32']
             output_blob_names += ['all_obj_labels_int32']
-        if cfg.MODEL.USE_REL_INTERSECT or cfg.MODEL.ADD_REL_INTERSECT:
-            output_blob_names += ['int_rois']
         if cfg.MODEL.USE_NODE_CONTRASTIVE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_SO_AWARE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_P_AWARE_LOSS:
             output_blob_names += ['binary_labels_sbj_pos_int32',
                                   'sbj_rois_sbj_pos', 'obj_rois_sbj_pos', 'rel_rois_sbj_pos',

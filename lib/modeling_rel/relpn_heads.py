@@ -122,7 +122,7 @@ class single_scale_relpn_outputs(nn.Module):
             if cfg.MODEL.USE_SPATIAL_FEAT:
                 spt_feat = box_utils_rel.get_spt_features(sbj_boxes, obj_boxes, im_w, im_h)
                 return_dict['spt_feat'] = spt_feat
-            if cfg.MODEL.USE_FREQ_BIAS or cfg.MODEL.RUN_BASELINE or cfg.MODEL.USE_SEM_CONCAT:
+            if cfg.MODEL.USE_FREQ_BIAS or cfg.MODEL.RUN_BASELINE:
                 return_dict['all_sbj_labels_int32'] = sbj_labels.astype(np.int32, copy=False) - 1  # det_labels start from 1
                 return_dict['all_obj_labels_int32'] = obj_labels.astype(np.int32, copy=False) - 1  # det_labels start from 1
             if cfg.FPN.FPN_ON and cfg.FPN.MULTILEVEL_ROIS:
@@ -132,50 +132,14 @@ class single_scale_relpn_outputs(nn.Module):
                 # when they are associated with different relationships
                 # Thus we cannot get det_rois features then gather sbj/obj features
                 # The only way is gather sbj/obj per relationship, thus need to return sbj_rois/obj_rois
-                if cfg.MODEL.USE_MIN_REL_AREA:
-                    rois_blob_names = ['sbj_rois', 'obj_rois', 'rel_rois']
-                    lowest_target_lvls = None
-                    for rois_blob_name in rois_blob_names:
-                        target_lvls = fpn_utils.map_rois_to_fpn_levels(
-                            return_dict[rois_blob_name][:, 1:5], lvl_min, lvl_max)
-                        if lowest_target_lvls is None:
-                            lowest_target_lvls = target_lvls
-                        else:
-                            lowest_target_lvls = np.minimum(lowest_target_lvls, target_lvls)
-                    for rois_blob_name in rois_blob_names:
-                        # Add per FPN level roi blobs named like: <rois_blob_name>_fpn<lvl>
-                        if rois_blob_name == 'rel_rois' and cfg.MODEL.USE_ALL_LEVELS:
-                            fpn_utils.add_multilevel_roi_blobs(
-                                return_dict, rois_blob_name, return_dict[rois_blob_name], None, lvl_min,
-                                lvl_max)
-                        else:
-                            fpn_utils.add_multilevel_roi_blobs(
-                                return_dict, rois_blob_name, return_dict[rois_blob_name], lowest_target_lvls, lvl_min,
-                                lvl_max)
-                    # rel intersect rois are mapped separately since they can be very small
-                    if cfg.MODEL.USE_REL_INTERSECT or cfg.MODEL.ADD_REL_INTERSECT:
-                        target_lvls = fpn_utils.map_rois_to_fpn_levels(
-                            return_dict['int_rois'][:, 1:5], lvl_min, lvl_max)
-                        # Add per FPN level roi blobs named like: <rois_blob_name>_fpn<lvl>
-                        fpn_utils.add_multilevel_roi_blobs(
-                            return_dict, 'int_rois', return_dict['int_rois'], target_lvls,
-                            lvl_min, lvl_max)
-                else:
-                    rois_blob_names = ['det_rois', 'rel_rois']
-                    if cfg.MODEL.USE_REL_INTERSECT or cfg.MODEL.ADD_REL_INTERSECT:
-                        rois_blob_names += ['int_rois']
-                    for rois_blob_name in rois_blob_names:
-                        # Add per FPN level roi blobs named like: <rois_blob_name>_fpn<lvl>
-                        if rois_blob_name == 'rel_rois' and cfg.MODEL.USE_ALL_LEVELS:
-                            fpn_utils.add_multilevel_roi_blobs(
-                                return_dict, rois_blob_name, return_dict[rois_blob_name], None, lvl_min,
-                                lvl_max)
-                        else:
-                            target_lvls = fpn_utils.map_rois_to_fpn_levels(
-                                return_dict[rois_blob_name][:, 1:5], lvl_min, lvl_max)
-                            fpn_utils.add_multilevel_roi_blobs(
-                                return_dict, rois_blob_name, return_dict[rois_blob_name], target_lvls,
-                                lvl_min, lvl_max)
+                rois_blob_names = ['det_rois', 'rel_rois']
+                for rois_blob_name in rois_blob_names:
+                    # Add per FPN level roi blobs named like: <rois_blob_name>_fpn<lvl>
+                    target_lvls = fpn_utils.map_rois_to_fpn_levels(
+                        return_dict[rois_blob_name][:, 1:5], lvl_min, lvl_max)
+                    fpn_utils.add_multilevel_roi_blobs(
+                        return_dict, rois_blob_name, return_dict[rois_blob_name], target_lvls,
+                        lvl_min, lvl_max)
 
         return return_dict
 

@@ -20,12 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 class reldn_head(nn.Module):
-    def __init__(self, dim_in, word2vec_model=None):
+    def __init__(self, dim_in):
         super().__init__()
-        if cfg.MODEL.USE_REL_INTERSECT:
-            dim_in_final = dim_in // 4
-        else:
-            dim_in_final = dim_in // 3
+        dim_in_final = dim_in // 3
         self.dim_in_final = dim_in_final
             
         if cfg.MODEL.USE_BG:
@@ -44,12 +41,7 @@ class reldn_head(nn.Module):
             nn.Linear(dim_in // 2, dim_in_final),
             nn.LeakyReLU(0.1))
         self.prd_cls_scores = nn.Linear(dim_in_final, num_prd_classes)
-        if cfg.MODEL.USE_LOGITS_ATTN:
-            self.prd_cls_attns = nn.Sequential(
-                nn.Linear(num_prd_classes, num_prd_classes),
-                nn.LeakyReLU(0.1),
-                nn.Linear(num_prd_classes, num_prd_classes))
-            
+        
         if cfg.MODEL.USE_FREQ_BIAS:
             # Assume we are training/testing on only one dataset
             if len(cfg.TRAIN.DATASETS):
@@ -64,27 +56,10 @@ class reldn_head(nn.Module):
                 nn.Linear(64, 64),
                 nn.LeakyReLU(0.1))
             self.spt_cls_scores = nn.Linear(64, num_prd_classes)
-            if cfg.MODEL.USE_LOGITS_ATTN:
-                self.prd_spt_attns = nn.Sequential(
-                    nn.Linear(num_prd_classes, num_prd_classes),
-                    nn.LeakyReLU(0.1),
-                    nn.Linear(num_prd_classes, num_prd_classes))
         
         if cfg.MODEL.ADD_SO_SCORES:
             self.prd_sbj_scores = nn.Linear(dim_in_final, num_prd_classes)
             self.prd_obj_scores = nn.Linear(dim_in_final, num_prd_classes)
-            if cfg.MODEL.USE_LOGITS_ATTN:
-                self.prd_sbj_attns = nn.Sequential(
-                    nn.Linear(num_prd_classes, num_prd_classes),
-                    nn.LeakyReLU(0.1),
-                    nn.Linear(num_prd_classes, num_prd_classes))
-                self.prd_obj_attns = nn.Sequential(
-                    nn.Linear(num_prd_classes, num_prd_classes),
-                    nn.LeakyReLU(0.1),
-                    nn.Linear(num_prd_classes, num_prd_classes))
-                
-        if cfg.MODEL.USE_SEPARATE_SO_SCORES:
-            self.so_cls_scores = nn.Linear(dim_in_final, cfg.MODEL.NUM_CLASSES - 1)
         
         self._init_weights()
         
@@ -100,7 +75,7 @@ class reldn_head(nn.Module):
                 nn.init.constant_(m.bias, 0)
 
     # spo_feat will be concatenation of SPO
-    def forward(self, spo_feat, spt_feat=None, sbj_labels=None, obj_labels=None, sbj_feat=None, obj_feat=None, sio_feat=None):
+    def forward(self, spo_feat, spt_feat=None, sbj_labels=None, obj_labels=None, sbj_feat=None, obj_feat=None):
 
         device_id = spo_feat.get_device()
         if sbj_labels is not None:
@@ -118,17 +93,8 @@ class reldn_head(nn.Module):
             spo_feat = spo_feat.squeeze(3).squeeze(2)
         prd_cls_feats = self.prd_cls_feats(spo_feat)
         prd_vis_scores = self.prd_cls_scores(prd_cls_feats)
-        if cfg.MODEL.USE_LOGITS_ATTN:
-            prd_cls_attns = self.prd_cls_attns(prd_vis_scores)
-            prd_cls_attns = F.sigmoid(prd_cls_attns)
-            prd_vis_scores = prd_cls_attns * prd_vis_scores
-
-        if cfg.MODEL.USE_SEPARATE_SO_SCORES:
-            sbj_cls_scores = self.so_cls_scores(sbj_hidden)
-            obj_cls_scores = self.so_cls_scores(obj_hidden)
-        else:
-            sbj_cls_scores = None
-            obj_cls_scores = None
+        sbj_cls_scores = None
+        obj_cls_scores = None
             
         if cfg.MODEL.USE_FREQ_BIAS:
             assert sbj_labels is not None and obj_labels is not None
@@ -140,35 +106,14 @@ class reldn_head(nn.Module):
             spt_feat = Variable(torch.from_numpy(spt_feat.astype('float32'))).cuda(device_id)
             spt_cls_feats = self.spt_cls_feats(spt_feat)
             prd_spt_scores = self.spt_cls_scores(spt_cls_feats)
-            if cfg.MODEL.USE_LOGITS_ATTN:
-                prd_spt_attns = self.prd_spt_attns(prd_spt_scores)
-                prd_spt_attns = F.sigmoid(prd_spt_attns)
-                prd_spt_scores = prd_spt_attns * prd_spt_scores
         else:
             prd_spt_scores = None
             
         if cfg.MODEL.ADD_SO_SCORES:
             prd_sbj_scores = self.prd_sbj_scores(sbj_feat)
             prd_obj_scores = self.prd_obj_scores(obj_feat)
-            if cfg.MODEL.USE_LOGITS_ATTN:
-                prd_sbj_attns = self.prd_sbj_attns(prd_sbj_scores)
-                prd_sbj_attns = F.sigmoid(prd_sbj_attns)
-                prd_sbj_scores = prd_sbj_attns * prd_sbj_scores
-                prd_obj_attns = self.prd_obj_attns(prd_obj_scores)
-                prd_obj_attns = F.sigmoid(prd_obj_attns)
-                prd_obj_scores = prd_obj_attns * prd_obj_scores
-        
-        if cfg.MODEL.ADD_REL_INTERSECT:
-            if sio_feat.dim() == 4:
-                sio_feat = sio_feat.squeeze(3).squeeze(2)
-            int_cls_feats = self.int_cls_feats(sio_feat)
-            int_cls_scores = self.int_cls_scores(int_cls_feats)
-            if cfg.MODEL.USE_LOGITS_ATTN:
-                int_cls_attns = self.int_cls_attns(int_cls_scores)
-                int_cls_attns = F.sigmoid(int_cls_attns)
-                int_cls_scores = int_cls_attns * int_cls_scores
             
-        if cfg.MODEL.COMBINE_SCORES or cfg.MODEL.COMBINE_SCORES_ALL or cfg.MODEL.ADD_SCORES_ALL:
+        if cfg.MODEL.ADD_SCORES_ALL:
             ttl_cls_scores = torch.tensor(prd_vis_scores)
             if cfg.MODEL.USE_FREQ_BIAS:
                 ttl_cls_scores += prd_bias_scores
@@ -176,8 +121,6 @@ class reldn_head(nn.Module):
                 ttl_cls_scores += prd_spt_scores
             if cfg.MODEL.ADD_SO_SCORES:
                 ttl_cls_scores += prd_sbj_scores + prd_obj_scores
-            if cfg.MODEL.ADD_REL_INTERSECT:
-                ttl_cls_scores += int_cls_scores
         else:
             ttl_cls_scores = None
             
@@ -185,12 +128,9 @@ class reldn_head(nn.Module):
             prd_vis_scores = F.softmax(prd_vis_scores, dim=1)
             if cfg.MODEL.USE_FREQ_BIAS:
                 prd_bias_scores = F.softmax(prd_bias_scores, dim=1)
-            if cfg.MODEL.USE_SEPARATE_SO_SCORES:
-                sbj_cls_scores = F.softmax(sbj_cls_scores, dim=1)
-                obj_cls_scores = F.softmax(obj_cls_scores, dim=1)
             if cfg.MODEL.USE_SPATIAL_FEAT:
                 prd_spt_scores = F.softmax(prd_spt_scores, dim=1)
-            if cfg.MODEL.COMBINE_SCORES or cfg.MODEL.COMBINE_SCORES_ALL or cfg.MODEL.ADD_SCORES_ALL:
+            if cfg.MODEL.ADD_SCORES_ALL:
                 ttl_cls_scores = F.softmax(ttl_cls_scores, dim=1)
         
         return prd_vis_scores, prd_bias_scores, prd_spt_scores, ttl_cls_scores, sbj_cls_scores, obj_cls_scores

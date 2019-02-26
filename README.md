@@ -15,7 +15,13 @@ The requirements are the same with [Detectron.pytorch](https://github.com/roytse
   * packaging
   * [pycocotools](https://github.com/cocodataset/cocoapi)
   * tensorboardX
+
+  * tqdm
+  * pillow
+  * scikit-image
 * An NVIDIA GPU and CUDA 8.0 or higher. Some operations only have gpu implementation.
+
+A dockerfile with all necessary dependencies is included in docker/Dockerfile. 
 
 ## Compilation
 Compile the CUDA code in the Detectron submodule and in the repo:
@@ -43,7 +49,8 @@ Download it [here](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwj
 Download it [here](https://drive.google.com/open?id=1VDuba95vIPVhg5DiriPtwuVA6mleYGad). Unzip it under the data folder. You should see a `vg` folder unzipped there. It contains .json annotations that suit the dataloader used in this repo.
 
 ### Visual Relation Detection
-Download it [here](https://drive.google.com/open?id=1BUZIVOCEp_-_e9Rs4hVgmbKjLhR2aUT6). Unzip it under the data folder. You should see a `vrd` folder unzipped there. It contains .json annotations that suit the dataloader used in this repo.
+
+See [Images:VRD](#visual-relation-detection-1)
 
 ## Images
 
@@ -66,17 +73,22 @@ mkdir VG_100K
 Download Visual Genome images from the [official page](https://visualgenome.org/api/v0/api_home.html). Unzip all images (part 1 and part 2) into `VG_100K/`. There should be a total of 108249 files.
 
 ### Visual Relation Detection
-Create a folder for train and validation images:
+Create the vrd folder under `data`:
 ```
 # ROOT=path/to/cloned/repository
 cd $ROOT/data/vrd
-mkdir train_images
-mkdir val_images
 ```
-Download Visual Relation Detection images from the [official page](https://cs.stanford.edu/people/ranjaykrishna/vrd/). Put training images into `train_images/` and testing images into `val_images/`.
+Download the original annotation json files from [here](https://cs.stanford.edu/people/ranjaykrishna/vrd/) and unzip `json_dataset.zip` here. The images can be downloaded from [here](http://imagenet.stanford.edu/internal/jcjohns/scene_graphs/sg_dataset.zip). Unzip `sg_dataset.zip` to create an `sg_dataset` folder in `data/vrd`. Next run the preprocessing script:
+
+```
+cd $ROOT
+python tools/rename_vrd_with_numbers.py
+```
+
+
 
 ## Pre-trained Object Detection Models
-Download pre-trained object detection models [here](https://drive.google.com/open?id=1_7Qw8oqDvmMpp9cBCkUZY7PByH6iINOl). Unzip it under the root directory.
+Download pre-trained object detection models [here](https://drive.google.com/open?id=1NrqOLbMa_RwHbG3KIXJFWLnlND2kiIpj). Unzip it under the root directory.
 
 ## Our Trained Relationship Detection Models
 Download our trained models [here](https://drive.google.com/open?id=1mVnkZXdlg1ClVF5cGrSgQm31Q3Z0ZcNX). Unzip it under the root folder and you should see a `trained_models` folder there.

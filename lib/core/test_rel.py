@@ -112,9 +112,7 @@ def im_get_det_rels(model, im, dataset_name, target_scale, target_max_size, boxe
             prd_scores_bias = return_dict['prd_scores_bias'].data.cpu().numpy()
         if cfg.MODEL.USE_SPATIAL_FEAT:
             prd_scores_spt = return_dict['prd_scores_spt'].data.cpu().numpy()
-        if cfg.MODEL.USE_EMBED:
-            prd_scores_embd = return_dict['prd_embd_scores'].data.cpu().numpy()
-        if cfg.MODEL.COMBINE_SCORES or cfg.MODEL.COMBINE_SCORES_ALL or cfg.MODEL.ADD_SCORES_ALL:
+        if cfg.MODEL.ADD_SCORES_ALL:
             prd_scores_ttl = return_dict['prd_ttl_scores'].data.cpu().numpy()
 
         return_dict2 = dict(sbj_boxes=sbj_boxes,
@@ -124,15 +122,13 @@ def im_get_det_rels(model, im, dataset_name, target_scale, target_max_size, boxe
                             obj_labels=obj_labels.astype(np.int32, copy=False),
                             obj_scores=obj_scores,
                             prd_scores=prd_scores)
-        if cfg.MODEL.COMBINE_SCORES or cfg.MODEL.COMBINE_SCORES_ALL or cfg.MODEL.ADD_SCORES_ALL:
+        if cfg.MODEL.ADD_SCORES_ALL:
             return_dict2['prd_scores_ttl'] = prd_scores_ttl
 
         if cfg.MODEL.USE_FREQ_BIAS:
             return_dict2['prd_scores_bias'] = prd_scores_bias
         if cfg.MODEL.USE_SPATIAL_FEAT:
             return_dict2['prd_scores_spt'] = prd_scores_spt
-        if cfg.MODEL.USE_EMBED:
-            return_dict2['prd_scores_embd'] = prd_scores_embd
         if do_vis:
             if isinstance(return_dict['blob_conv'], list):
                 blob_conv = [b.data.cpu().numpy().squeeze() for b in return_dict['blob_conv']]

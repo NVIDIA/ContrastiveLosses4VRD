@@ -1,11 +1,7 @@
-"""
-Some functions are adapted from Rowan Zellers:
-https://github.com/rowanz/neural-motifs
-"""
-"""
-Get counts of all of the examples in the dataset. Used for creating the baseline
-dictionary model
-"""
+# Some functions are adapted from Rowan Zellers:
+# https://github.com/rowanz/neural-motifs
+# Get counts of all of the examples in the dataset. Used for creating the baseline
+# dictionary model
 
 from __future__ import absolute_import
 from __future__ import division
@@ -18,6 +14,9 @@ import json
 import utils.boxes as box_utils
 import utils_rel.boxes_rel as box_utils_rel
 from core.config import cfg
+
+from datasets_rel.dataset_catalog_rel import ANN_FN2
+from datasets_rel.dataset_catalog_rel import DATASETS
 
 
 # This function is adapted from Rowan Zellers:
@@ -32,13 +31,13 @@ def get_rel_counts(ds_name, must_overlap=True):
     """
 
     if ds_name.find('vg') >= 0:
-        with open(cfg.DATA_DIR + '/vg/rel_annotations_train.json') as f:
+        with open(DATASETS['vg_train'][ANN_FN2]) as f:
             train_data = json.load(f)
     elif ds_name.find('oi') >= 0:
-        with open(cfg.DATA_DIR + '/openimages_v4/rel/rel_only_annotations_train.json') as f:
+        with open(DATASETS['oi_rel_train'][ANN_FN2]) as f:
             train_data = json.load(f)
     elif ds_name.find('vrd') >= 0:
-        with open(cfg.DATA_DIR + '/vrd/json_dataset/new_annotations_train.json') as f:
+        with open(DATASETS['vrd_train'][ANN_FN2]) as f:
             train_data = json.load(f)
     else:
         raise NotImplementedError

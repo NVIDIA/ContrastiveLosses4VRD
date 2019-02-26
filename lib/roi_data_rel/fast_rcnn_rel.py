@@ -118,7 +118,7 @@ def _sample_pairs(roidb, im_scale, batch_idx):
         sampled_spt_feat = box_utils_rel.get_spt_features(
             sampled_sbj_boxes, sampled_obj_boxes, roidb['width'], roidb['height'])
         blob_dict['spt_feat'] = sampled_spt_feat
-    if cfg.MODEL.USE_FREQ_BIAS or cfg.MODEL.USE_SEPARATE_SO_SCORES:
+    if cfg.MODEL.USE_FREQ_BIAS:
         sbj_labels = roidb['max_sbj_classes'][keep_pair_inds]
         obj_labels = roidb['max_obj_classes'][keep_pair_inds]
         blob_dict['all_sbj_labels_int32'] = sbj_labels.astype(np.int32, copy=False)
@@ -291,28 +291,17 @@ def _add_rel_multilevel_rois(blobs):
                 lowest_target_lvls = np.minimum(lowest_target_lvls, target_lvls)
         for rois_blob_name in rois_blob_names:
             # Add per FPN level roi blobs named like: <rois_blob_name>_fpn<lvl>
-            if rois_blob_name == 'rel_rois' and cfg.MODEL.USE_ALL_LEVELS:
-                fpn_utils.add_multilevel_roi_blobs(
-                    blobs, rois_blob_name, blobs[rois_blob_name], None, lvl_min,
-                    lvl_max)
-            else:
-                fpn_utils.add_multilevel_roi_blobs(
-                    blobs, rois_blob_name, blobs[rois_blob_name], lowest_target_lvls, lvl_min,
-                    lvl_max)
+            fpn_utils.add_multilevel_roi_blobs(
+                blobs, rois_blob_name, blobs[rois_blob_name], lowest_target_lvls, lvl_min,
+                lvl_max)
 
-    if cfg.MODEL.USE_MIN_REL_AREA:
-        _distribute_rois_over_fpn_levels(['sbj_rois', 'obj_rois', 'rel_rois'])
-        if cfg.MODEL.USE_NODE_CONTRASTIVE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_SO_AWARE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_P_AWARE_LOSS:
-            _distribute_rois_over_fpn_levels(['sbj_rois_sbj_pos', 'obj_rois_sbj_pos', 'rel_rois_sbj_pos'])
-            _distribute_rois_over_fpn_levels(['sbj_rois_obj_pos', 'obj_rois_obj_pos', 'rel_rois_obj_pos'])
-    else:
-        _distribute_rois_over_fpn_levels(['sbj_rois'])
-        _distribute_rois_over_fpn_levels(['obj_rois'])
-        _distribute_rois_over_fpn_levels(['rel_rois'])
-        if cfg.MODEL.USE_NODE_CONTRASTIVE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_SO_AWARE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_P_AWARE_LOSS:
-            _distribute_rois_over_fpn_levels(['sbj_rois_sbj_pos'])
-            _distribute_rois_over_fpn_levels(['obj_rois_sbj_pos'])
-            _distribute_rois_over_fpn_levels(['rel_rois_sbj_pos'])
-            _distribute_rois_over_fpn_levels(['sbj_rois_obj_pos'])
-            _distribute_rois_over_fpn_levels(['obj_rois_obj_pos'])
-            _distribute_rois_over_fpn_levels(['rel_rois_obj_pos'])
+    _distribute_rois_over_fpn_levels(['sbj_rois'])
+    _distribute_rois_over_fpn_levels(['obj_rois'])
+    _distribute_rois_over_fpn_levels(['rel_rois'])
+    if cfg.MODEL.USE_NODE_CONTRASTIVE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_SO_AWARE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_P_AWARE_LOSS:
+        _distribute_rois_over_fpn_levels(['sbj_rois_sbj_pos'])
+        _distribute_rois_over_fpn_levels(['obj_rois_sbj_pos'])
+        _distribute_rois_over_fpn_levels(['rel_rois_sbj_pos'])
+        _distribute_rois_over_fpn_levels(['sbj_rois_obj_pos'])
+        _distribute_rois_over_fpn_levels(['obj_rois_obj_pos'])
+        _distribute_rois_over_fpn_levels(['rel_rois_obj_pos'])

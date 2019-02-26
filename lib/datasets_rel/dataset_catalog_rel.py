@@ -44,16 +44,6 @@ RAW_DIR = 'raw_dir'
 # Available datasets
 DATASETS = {
     # OpenImages_v4 rel dataset for relationship task
-    'oi_rel_vg_aug_train': {
-        IM_DIR:
-            _DATA_DIR + '/openimages_v4/train',
-        ANN_FN:
-            _DATA_DIR + '/openimages_v4/rel/detections_vg_aug_train.json',
-        ANN_FN2:
-            _DATA_DIR + '/openimages_v4/rel/rel_only_vg_aug_annotations_train.json',
-        ANN_FN3:
-            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
-    },
     'oi_rel_train': {
         IM_DIR:
             _DATA_DIR + '/openimages_v4/train',
@@ -94,16 +84,6 @@ DATASETS = {
         ANN_FN3:
             _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
     },
-    'oi_all_rel_val': {
-        IM_DIR:
-            _DATA_DIR + '/openimages_v4/train',
-        ANN_FN:
-            _DATA_DIR + '/openimages_v4/rel/detections_val.json',
-        ANN_FN2:
-            _DATA_DIR + '/openimages_v4/rel/all_rel_only_annotations_val.json',
-        ANN_FN3:
-            _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
-    },
     # for Kaggle test
     'oi_kaggle_rel_test': {
         IM_DIR:
@@ -114,27 +94,6 @@ DATASETS = {
             _DATA_DIR + '/openimages_v4/rel/kaggle_test_images/all_rel_only_annotations_test.json',
         ANN_FN3:
             _DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json',
-    },
-    # VG mini
-    'vg_train_mini': {
-        IM_DIR:
-            _DATA_DIR + '/vg/VG_100K',
-        ANN_FN:
-            _DATA_DIR + '/vg/detections_train_mini.json',
-        ANN_FN2:
-            _DATA_DIR + '/vg/rel_annotations_train_mini.json',
-        ANN_FN3:
-            _DATA_DIR + '/vg/predicates.json',
-    },
-    'vg_val_mini': {
-        IM_DIR:
-            _DATA_DIR + '/vg/VG_100K',
-        ANN_FN:
-            _DATA_DIR + '/vg/detections_val_mini.json',
-        ANN_FN2:
-            _DATA_DIR + '/vg/rel_annotations_val_mini.json',
-        ANN_FN3:
-            _DATA_DIR + '/vg/predicates.json',
     },
     # VG dataset
     'vg_train': {
@@ -160,22 +119,22 @@ DATASETS = {
     # VRD dataset
     'vrd_train': {
         IM_DIR:
-            _DATA_DIR + '/vrd/json_dataset/train_images',
+            _DATA_DIR + '/vrd/train_images',
         ANN_FN:
-            _DATA_DIR + '/vrd/json_dataset/detections_train.json',
+            _DATA_DIR + '/vrd/detections_train.json',
         ANN_FN2:
-            _DATA_DIR + '/vrd/json_dataset/new_annotations_train.json',
+            _DATA_DIR + '/vrd/new_annotations_train.json',
         ANN_FN3:
-            _DATA_DIR + '/vrd/json_dataset/predicates.json',
+            _DATA_DIR + '/vrd/predicates.json',
     },
     'vrd_val': {
         IM_DIR:
-            _DATA_DIR + '/vrd/json_dataset/val_images',
+            _DATA_DIR + '/vrd/val_images',
         ANN_FN:
-            _DATA_DIR + '/vrd/json_dataset/detections_val.json',
+            _DATA_DIR + '/vrd/detections_val.json',
         ANN_FN2:
-            _DATA_DIR + '/vrd/json_dataset/new_annotations_val.json',
+            _DATA_DIR + '/vrd/new_annotations_val.json',
         ANN_FN3:
-            _DATA_DIR + '/vrd/json_dataset/predicates.json',
+            _DATA_DIR + '/vrd/predicates.json',
     },
 }

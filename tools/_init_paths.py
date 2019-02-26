@@ -17,11 +17,11 @@ def add_path(path):
 
 this_dir = osp.abspath(osp.dirname(osp.dirname(__file__)))
 
+# add Detectron.PyTorch/lib
+detectron_path = osp.join(this_dir, 'Detectron_pytorch', 'lib')
+add_path(detectron_path)
+
 # Add lib to PYTHONPATH
 lib_path = osp.join(this_dir, 'lib')
 add_path(lib_path)
-
-# add Detectron.PyTorch/lib
-detectron_path = osp.join(this_dir, 'Detectron.pytorch', 'lib')
-add_path(detectron_path)
 

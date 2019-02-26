@@ -28,8 +28,8 @@ SOLVER:
   MAX_ITER: 7560  # 7560 roidbs
   STEPS: [0, 5040, 6720]
 VGG16:
-  VRD_PRETRAINED_WEIGHTS: 'detection_models/vrd/VGG16/model_step4499.pth'
-  VRD_PRD_PRETRAINED_WEIGHTS: 'detection_models/vrd/VGG16/model_step4499.pth'
+  VRD_PRETRAINED_WEIGHTS: 'detection_models/vrd/VGG16/COCO_pretrained/model_step4499.pth'
+  VRD_PRD_PRETRAINED_WEIGHTS: 'detection_models/vrd/VGG16/COCO_pretrained/model_step4499.pth'
 FAST_RCNN:
   ROI_BOX_HEAD: VGG16.VGG16_roi_conv5_head
   ROI_XFORM_METHOD: RoIAlign

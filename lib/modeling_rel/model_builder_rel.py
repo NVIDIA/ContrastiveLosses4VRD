@@ -6,7 +6,6 @@ import importlib
 import logging
 import numpy as np
 import copy
-import gensim
 import json
 
 import torch
@@ -106,7 +105,6 @@ class Generalized_RCNN(nn.Module):
             self.Conv_Body.spatial_scale = self.Conv_Body.spatial_scale[-self.num_roi_levels:]
 
         # BBOX Branch
-        # if not cfg.MODEL.RPN_ONLY:
         self.Box_Head = get_func(cfg.FAST_RCNN.ROI_BOX_HEAD)(
             self.RPN.dim_out, self.roi_feature_transform, self.Conv_Body.spatial_scale)
         self.Box_Outs = fast_rcnn_heads.fast_rcnn_outputs(
@@ -124,10 +122,7 @@ class Generalized_RCNN(nn.Module):
         # RelPN
         self.RelPN = relpn_heads.generic_relpn_outputs()
         # RelDN
-        if cfg.MODEL.USE_REL_INTERSECT:
-            self.RelDN = reldn_heads.reldn_head(self.Box_Head.dim_out * 4)
-        else:
-            self.RelDN = reldn_heads.reldn_head(self.Box_Head.dim_out * 3)
+        self.RelDN = reldn_heads.reldn_head(self.Box_Head.dim_out * 3)
 
         self._init_modules()
         
@@ -295,23 +290,8 @@ class Generalized_RCNN(nn.Module):
             blob_conv = blob_conv[-self.num_roi_levels:]
             if not cfg.MODEL.USE_REL_PYRAMID:
                 blob_conv_prd = blob_conv_prd[-self.num_roi_levels:]
-                if cfg.MODEL.USE_REL_LATERAL:
-                    blob_conv_prd = self.RelLateral(blob_conv, blob_conv_prd)
             else:
                 blob_conv_prd = self.RelPyramid(blob_conv)
-                
-        if cfg.MODEL.USE_GLOBAL_ATTN:
-            if cfg.FPN.FPN_ON:
-                for i in range(len(blob_conv_prd)):
-                    blob_conv_prd[i] = self.global_attn(blob_conv[i], blob_conv_prd[i])
-            else:
-                blob_conv_prd = self.global_attn(blob_conv, blob_conv_prd)
-        elif cfg.MODEL.USE_GLOBAL_ADAPTIVE_ATTN:
-            assert cfg.FPN.FPN_ON
-            blob_conv_prd = self.global_adaptive_attn(blob_conv, blob_conv_prd)
-        elif cfg.MODEL.USE_GLOBAL_SEPARATE_ATTN:
-            assert cfg.FPN.FPN_ON
-            blob_conv_prd = self.global_separate_attn(blob_conv, blob_conv_prd)
 
         if cfg.MODEL.SHARE_RES5 and self.training:
             box_feat, res5_feat = self.Box_Head(blob_conv, rpn_ret, use_relu=True)
@@ -371,16 +351,11 @@ class Generalized_RCNN(nn.Module):
                     rois_blob_names = ['sbj_rois', 'obj_rois', 'rel_rois']
                     for rois_blob_name in rois_blob_names:
                         # Add per FPN level roi blobs named like: <rois_blob_name>_fpn<lvl>
-                        if rois_blob_name == 'rel_rois' and cfg.MODEL.USE_ALL_LEVELS:
-                            fpn_utils.add_multilevel_roi_blobs(
-                                rel_ret, rois_blob_name, rel_ret[rois_blob_name], None,
-                                lvl_min, lvl_max)
-                        else:
-                            target_lvls = fpn_utils.map_rois_to_fpn_levels(
-                                rel_ret[rois_blob_name][:, 1:5], lvl_min, lvl_max)
-                            fpn_utils.add_multilevel_roi_blobs(
-                                rel_ret, rois_blob_name, rel_ret[rois_blob_name], target_lvls,
-                                lvl_min, lvl_max)
+                        target_lvls = fpn_utils.map_rois_to_fpn_levels(
+                            rel_ret[rois_blob_name][:, 1:5], lvl_min, lvl_max)
+                        fpn_utils.add_multilevel_roi_blobs(
+                            rel_ret, rois_blob_name, rel_ret[rois_blob_name], target_lvls,
+                            lvl_min, lvl_max)
                 sbj_det_feat = self.Box_Head(blob_conv, rel_ret, rois_name='sbj_rois', use_relu=True)
                 sbj_cls_scores, _ = self.Box_Outs(sbj_det_feat)
                 sbj_cls_scores = sbj_cls_scores.data.cpu().numpy()
@@ -424,34 +399,19 @@ class Generalized_RCNN(nn.Module):
                     logger.info('Got {} rel_rois when score_thresh={}, changing to {}'.format(
                         valid_len, score_thresh, score_thresh - 0.01))
                     score_thresh -= 0.01
-                # when use min_rel_area, the same sbj/obj area could be mapped to different feature levels
-                # when they are associated with different relationships
-                # Thus we cannot get det_rois features then gather sbj/obj
-                # The only way is gather sbj/obj per relationship, just like during training
-                if cfg.MODEL.USE_MIN_REL_AREA:
-                    if cfg.MODEL.ADD_SO_SCORES:
-                        sbj_feat = self.S_Head(blob_conv, rel_ret, rois_name='sbj_rois', use_relu=use_relu)
-                        obj_feat = self.O_Head(blob_conv, rel_ret, rois_name='obj_rois', use_relu=use_relu)
-                    else:
-                        sbj_feat = self.Box_Head(blob_conv, rel_ret, rois_name='sbj_rois', use_relu=use_relu)
-                        obj_feat = self.Box_Head(blob_conv, rel_ret, rois_name='obj_rois', use_relu=use_relu)
+                if cfg.MODEL.ADD_SO_SCORES:
+                    det_s_feat = self.S_Head(blob_conv, rel_ret, rois_name='det_rois', use_relu=use_relu)
+                    det_o_feat = self.O_Head(blob_conv, rel_ret, rois_name='det_rois', use_relu=use_relu)
+                    sbj_feat = det_s_feat[rel_ret['sbj_inds']]
+                    obj_feat = det_o_feat[rel_ret['obj_inds']]
                 else:
-                    if cfg.MODEL.ADD_SO_SCORES:
-                        det_s_feat = self.S_Head(blob_conv, rel_ret, rois_name='det_rois', use_relu=use_relu)
-                        det_o_feat = self.O_Head(blob_conv, rel_ret, rois_name='det_rois', use_relu=use_relu)
-                        sbj_feat = det_s_feat[rel_ret['sbj_inds']]
-                        obj_feat = det_o_feat[rel_ret['obj_inds']]
-                    else:
-                        det_feat = self.Box_Head(blob_conv, rel_ret, rois_name='det_rois', use_relu=use_relu)
-                        sbj_feat = det_feat[rel_ret['sbj_inds']]
-                        obj_feat = det_feat[rel_ret['obj_inds']]
+                    det_feat = self.Box_Head(blob_conv, rel_ret, rois_name='det_rois', use_relu=use_relu)
+                    sbj_feat = det_feat[rel_ret['sbj_inds']]
+                    obj_feat = det_feat[rel_ret['obj_inds']]
 
         rel_feat = self.Prd_RCNN.Box_Head(blob_conv_prd, rel_ret, rois_name='rel_rois', use_relu=use_relu)
 
-        if cfg.MODEL.USE_REL_INTERSECT:
-            spo_feat = torch.cat((sbj_feat, obj_feat, rel_feat, int_feat), dim=1)
-        else:
-            spo_feat = torch.cat((sbj_feat, rel_feat, obj_feat), dim=1)
+        spo_feat = torch.cat((sbj_feat, rel_feat, obj_feat), dim=1)
         if cfg.MODEL.USE_SPATIAL_FEAT:
             spt_feat = rel_ret['spt_feat']
         else:
@@ -462,14 +422,10 @@ class Generalized_RCNN(nn.Module):
         else:
             sbj_labels = None
             obj_labels = None
-        if cfg.MODEL.ADD_REL_INTERSECT:
-            sio_feat = torch.cat((sbj_feat, int_feat, obj_feat), dim=1)
-        else:
-            sio_feat = None
         
         # prd_scores is the visual scores. See reldn_heads.py
         prd_scores, prd_bias_scores, prd_spt_scores, ttl_cls_scores, sbj_cls_scores, obj_cls_scores = \
-            self.RelDN(spo_feat, spt_feat, sbj_labels, obj_labels, sbj_feat, obj_feat, sio_feat)
+            self.RelDN(spo_feat, spt_feat, sbj_labels, obj_labels, sbj_feat, obj_feat)
 
         if self.training:
             return_dict['losses'] = {}
@@ -495,20 +451,6 @@ class Generalized_RCNN(nn.Module):
             return_dict['losses']['loss_bbox'] = loss_bbox
             return_dict['metrics']['accuracy_cls'] = accuracy_cls
             
-            if not cfg.MODEL.ADD_SCORES_ALL:
-                loss_cls_prd, accuracy_cls_prd = reldn_heads.reldn_losses(
-                    prd_scores, rel_ret['all_prd_labels_int32'])
-                return_dict['losses']['loss_cls_prd'] = loss_cls_prd
-                return_dict['metrics']['accuracy_cls_prd'] = accuracy_cls_prd
-            if cfg.MODEL.USE_SEPARATE_SO_SCORES:
-                loss_cls_sbj, accuracy_cls_sbj = reldn_heads.reldn_losses(
-                    sbj_cls_scores, rel_ret['all_sbj_labels_int32'])
-                loss_cls_obj, accuracy_cls_obj = reldn_heads.reldn_losses(
-                    obj_cls_scores, rel_ret['all_obj_labels_int32'])
-                return_dict['losses']['loss_cls_sbj'] = loss_cls_sbj
-                return_dict['metrics']['accuracy_cls_sbj'] = accuracy_cls_sbj
-                return_dict['losses']['loss_cls_obj'] = loss_cls_obj
-                return_dict['metrics']['accuracy_cls_obj'] = accuracy_cls_obj
             if cfg.MODEL.USE_FREQ_BIAS and not cfg.MODEL.ADD_SCORES_ALL:
                 loss_cls_bias, accuracy_cls_bias = reldn_heads.reldn_losses(
                     prd_bias_scores, rel_ret['all_prd_labels_int32'])
@@ -519,16 +461,20 @@ class Generalized_RCNN(nn.Module):
                     prd_spt_scores, rel_ret['all_prd_labels_int32'])
                 return_dict['losses']['loss_cls_spt'] = loss_cls_spt
                 return_dict['metrics']['accuracy_cls_spt'] = accuracy_cls_spt
-            if cfg.MODEL.COMBINE_SCORES or cfg.MODEL.COMBINE_SCORES_ALL or cfg.MODEL.ADD_SCORES_ALL:
+            if cfg.MODEL.ADD_SCORES_ALL:
                 loss_cls_ttl, accuracy_cls_ttl = reldn_heads.reldn_losses(
                     ttl_cls_scores, rel_ret['all_prd_labels_int32'])
                 return_dict['losses']['loss_cls_ttl'] = loss_cls_ttl
                 return_dict['metrics']['accuracy_cls_ttl'] = accuracy_cls_ttl
+            else:
+                loss_cls_prd, accuracy_cls_prd = reldn_heads.reldn_losses(
+                    prd_scores, rel_ret['all_prd_labels_int32'])
+                return_dict['losses']['loss_cls_prd'] = loss_cls_prd
+                return_dict['metrics']['accuracy_cls_prd'] = accuracy_cls_prd
             if cfg.MODEL.USE_NODE_CONTRASTIVE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_SO_AWARE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_P_AWARE_LOSS:
                 # sbj
                 rel_feat_sbj_pos = self.Prd_RCNN.Box_Head(blob_conv_prd, rel_ret, rois_name='rel_rois_sbj_pos', use_relu=use_relu)
                 spo_feat_sbj_pos = torch.cat((sbj_feat_sbj_pos, rel_feat_sbj_pos, obj_feat_sbj_pos), dim=1)
-                sio_feat_sbj_pos = None
                 if cfg.MODEL.USE_SPATIAL_FEAT:
                     spt_feat_sbj_pos = rel_ret['spt_feat_sbj_pos']
                 else:
@@ -540,11 +486,10 @@ class Generalized_RCNN(nn.Module):
                     sbj_labels_sbj_pos_fg = None
                     obj_labels_sbj_pos_fg = None
                 _, prd_bias_scores_sbj_pos, _, ttl_cls_scores_sbj_pos, _, _ = \
-                    self.RelDN(spo_feat_sbj_pos, spt_feat_sbj_pos, sbj_labels_sbj_pos_fg, obj_labels_sbj_pos_fg, sbj_feat_sbj_pos, obj_feat_sbj_pos, sio_feat_sbj_pos)
+                    self.RelDN(spo_feat_sbj_pos, spt_feat_sbj_pos, sbj_labels_sbj_pos_fg, obj_labels_sbj_pos_fg, sbj_feat_sbj_pos, obj_feat_sbj_pos)
                 # obj
                 rel_feat_obj_pos = self.Prd_RCNN.Box_Head(blob_conv_prd, rel_ret, rois_name='rel_rois_obj_pos', use_relu=use_relu)
                 spo_feat_obj_pos = torch.cat((sbj_feat_obj_pos, rel_feat_obj_pos, obj_feat_obj_pos), dim=1)
-                sio_feat_obj_pos = None
                 if cfg.MODEL.USE_SPATIAL_FEAT:
                     spt_feat_obj_pos = rel_ret['spt_feat_obj_pos']
                 else:
@@ -556,7 +501,7 @@ class Generalized_RCNN(nn.Module):
                     sbj_labels_obj_pos_fg = None
                     obj_labels_obj_pos_fg = None
                 _, prd_bias_scores_obj_pos, _, ttl_cls_scores_obj_pos, _, _ = \
-                    self.RelDN(spo_feat_obj_pos, spt_feat_obj_pos, sbj_labels_obj_pos_fg, obj_labels_obj_pos_fg, sbj_feat_obj_pos, obj_feat_obj_pos, sio_feat_obj_pos)
+                    self.RelDN(spo_feat_obj_pos, spt_feat_obj_pos, sbj_labels_obj_pos_fg, obj_labels_obj_pos_fg, sbj_feat_obj_pos, obj_feat_obj_pos)
                 if cfg.MODEL.USE_NODE_CONTRASTIVE_LOSS:
                     loss_contrastive_sbj, loss_contrastive_obj = reldn_heads.reldn_contrastive_losses(
                         ttl_cls_scores_sbj_pos, ttl_cls_scores_obj_pos, rel_ret)
@@ -591,7 +536,7 @@ class Generalized_RCNN(nn.Module):
                 return_dict['prd_scores_bias'] = prd_bias_scores
             if cfg.MODEL.USE_SPATIAL_FEAT:
                 return_dict['prd_scores_spt'] = prd_spt_scores
-            if cfg.MODEL.COMBINE_SCORES or cfg.MODEL.COMBINE_SCORES_ALL or cfg.MODEL.ADD_SCORES_ALL:
+            if cfg.MODEL.ADD_SCORES_ALL:
                 return_dict['prd_ttl_scores'] = ttl_cls_scores
             if do_vis:
                 return_dict['blob_conv'] = blob_conv
@@ -637,9 +582,7 @@ class Generalized_RCNN(nn.Module):
             
             im_det_rois = np.hstack((batch_inds, im_boxes * im_info[im_i, 2]))
             det_rois = np.append(det_rois, im_det_rois, axis=0)
-            
             det_labels = np.append(det_labels, im_labels, axis=0)
-            
             det_scores = np.append(det_scores, im_scores, axis=0)
         
         return det_rois, det_labels, det_scores
@@ -762,18 +705,15 @@ class Generalized_RCNN(nn.Module):
                         xform_out = RoIAlignFunction(
                             resolution, resolution, sc, sampling_ratio)(bl_in, rois)
                     bl_out_list.append(xform_out)
-            if blob_rois.find('rel') < 0 or not cfg.MODEL.USE_ALL_LEVELS:
-                # The pooled features from all levels are concatenated along the
-                # batch dimension into a single 4D tensor.
-                xform_shuffled = torch.cat(bl_out_list, dim=0)
-                # Unshuffle to match rois from dataloader
-                device_id = xform_shuffled.get_device()
-                restore_bl = rpn_ret[blob_rois + '_idx_restore_int32']
-                restore_bl = Variable(
-                    torch.from_numpy(restore_bl.astype('int64', copy=False))).cuda(device_id)
-                xform_out = xform_shuffled[restore_bl]
-            else:
-                xform_out = sum(bl_out_list) / float(len(bl_out_list))
+            # The pooled features from all levels are concatenated along the
+            # batch dimension into a single 4D tensor.
+            xform_shuffled = torch.cat(bl_out_list, dim=0)
+            # Unshuffle to match rois from dataloader
+            device_id = xform_shuffled.get_device()
+            restore_bl = rpn_ret[blob_rois + '_idx_restore_int32']
+            restore_bl = Variable(
+                torch.from_numpy(restore_bl.astype('int64', copy=False))).cuda(device_id)
+            xform_out = xform_shuffled[restore_bl]
         else:
             # Single feature level
             # rois: holds R regions of interest, each is a 5-tuple

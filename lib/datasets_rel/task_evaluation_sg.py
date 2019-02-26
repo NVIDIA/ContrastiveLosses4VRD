@@ -216,7 +216,6 @@ def eval_rel_results(all_results, output_dir, do_val=True, do_vis=False, do_spec
                 ap_str += '{:.2f}, '.format(100 * ap)
                 print('rel AP for class {}: {:.2f} ({:.6f})'.format(rel_prd_cats[c], 100 * ap, float(npos[c]) / float(all_npos)))
             rel_mAP /= 9.
-#             print('rel mAP: {:.2f}'.format(100 * rel_mAP))
             print('weighted rel mAP: {:.2f}'.format(100 * w_rel_mAP))
             excel_str += ap_str
 
@@ -231,29 +230,26 @@ def eval_rel_results(all_results, output_dir, do_val=True, do_vis=False, do_spec
                 ap_str += '{:.2f}, '.format(100 * ap)
                 print('phr AP for class {}: {:.2f} ({:.6f})'.format(rel_prd_cats[c], 100 * ap, float(npos[c]) / float(all_npos)))
             phr_mAP /= 9.
-#             print('phr mAP: {:.2f}'.format(100 * phr_mAP))
             print('weighted phr mAP: {:.2f}'.format(100 * w_phr_mAP))
             excel_str += ap_str
             
             # total: 0.4 x rel_mAP + 0.2 x R@50 + 0.4 x phr_mAP
             final_score = 0.4 * rel_mAP + 0.2 * recalls[50] + 0.4 * phr_mAP
-#             print('final_score: {:.2f}'.format(100 * final_score))
             
             # total: 0.4 x w_rel_mAP + 0.2 x R@50 + 0.4 x w_phr_mAP
             w_final_score = 0.4 * w_rel_mAP + 0.2 * recalls[50] + 0.4 * w_phr_mAP
             print('weighted final_score: {:.2f}'.format(100 * w_final_score))
             
             # get excel friendly string
-#             excel_str = '{:.6f}, {:.6f}, {:.6f}, {:.6f}, '.format(recalls[50], rel_mAP, phr_mAP, final_score) + excel_str
-            excel_str = '{:.2f}, {:.2f}, {:.2f}, {:.2f}, '.format(100 * recalls[50], 100 * w_rel_mAP, 100 * w_phr_mAP, 100 * w_final_score) + excel_str
-            print('Excel-friendly format:')
-            print(excel_str.strip()[:-1])
+            # excel_str = '{:.2f}, {:.2f}, {:.2f}, {:.2f}, '.format(100 * recalls[50], 100 * w_rel_mAP, 100 * w_phr_mAP, 100 * w_final_score) + excel_str
+            # print('Excel-friendly format:')
+            # print(excel_str.strip()[:-1])
     
-    print('Saving topk dets...')
-    topk_dets_f = os.path.join(output_dir, 'rel_detections_topk.pkl')
-    with open(topk_dets_f, 'wb') as f:
-        pickle.dump(topk_dets, f, pickle.HIGHEST_PROTOCOL)
-    logger.info('topk_dets size: {}'.format(len(topk_dets)))
+#     print('Saving topk dets...')
+#     topk_dets_f = os.path.join(output_dir, 'rel_detections_topk.pkl')
+#     with open(topk_dets_f, 'wb') as f:
+#         pickle.dump(topk_dets, f, pickle.HIGHEST_PROTOCOL)
+#     logger.info('topk_dets size: {}'.format(len(topk_dets)))
     print('Done.')
 
 
@@ -323,87 +319,3 @@ def _compute_pred_matches(gt_triplets, pred_triplets,
         for i in np.where(keep_inds)[0][inds]:
             pred_to_gt[i].append(int(gt_ind))
     return pred_to_gt
-
-
-def write_topk_dets_into_csv(topk_dets, output_dir):
-    
-    if cfg.TEST.DATASETS[0].find('oi') >= 0:
-        with open(cfg.DATA_DIR + '/openimages_v4/rel/rel_57_object_ids.json') as f:
-            rel_obj_ids = json.load(f)
-        with open(cfg.DATA_DIR + '/openimages_v4/rel/rel_9_predicates.json') as f:
-            rel_prd_cats = json.load(f)
-    elif cfg.TEST.DATASETS[0].find('vg') >= 0:
-        with open(cfg.DATA_DIR + '/vg/objects.json') as f:
-            rel_obj_cats = json.load(f)
-        with open(cfg.DATA_DIR + '/vg/predicates.json') as f:
-            rel_prd_cats = json.load(f)
-    else:
-        raise NotImplementedError
-    
-    if cfg.TEST.DATASETS[0].find('kaggle') >= 0:
-        with open(cfg.DATA_DIR + '/openimages_v4/rel/kaggle_test_images/test_image_sizes.json') as f:
-            all_image_sizes = json.load(f)
-    else:
-        with open(cfg.DATA_DIR + '/openimages_v4/rel/all_image_sizes.json') as f:
-            all_image_sizes = json.load(f)
-        
-    topk_dets_csv_f = os.path.join(output_dir, 'rel_detections_topk.csv')
-    print('Saving all topk dets csv to ', topk_dets_csv_f)
-        
-    with open(topk_dets_csv_f, 'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        csvwriter.writerow(
-            ['ImageID', 'PredictionString'])
-        for det in tqdm(topk_dets):
-            img_name = det['image'].split('/')[-1]
-            img_id = img_name.split('.')[0]
-
-            sbj_boxes = det['det_boxes_s_top']
-            obj_boxes = det['det_boxes_o_top']
-            sbj_labels = det['det_labels_s_top']
-            obj_labels = det['det_labels_o_top']
-            prd_labels = det['det_labels_p_top']
-            det_scores = det['det_scores_top']
-            
-            w = all_image_sizes[img_id][0]
-            h = all_image_sizes[img_id][1]
-
-            pred = ''
-            for j in range(sbj_labels.shape[0]):
-                sbj_box = sbj_boxes[j]
-                obj_box = obj_boxes[j]
-                sbj_lbl = sbj_labels[j]
-                obj_lbl = obj_labels[j]
-                prd_lbl = prd_labels[j]
-                rel_score = det_scores[j]
-
-                if cfg.TEST.DATASETS[0].find('oi') >= 0:
-                    lbl_s = rel_obj_ids[sbj_lbl]
-                    lbl_p = rel_prd_cats[prd_lbl]
-                    lbl_o = rel_obj_ids[obj_lbl]
-                elif cfg.TEST.DATASETS[0].find('vg') >= 0:
-                    lbl_s = sbj_lbl
-                    lbl_p = prd_lbl
-                    lbl_o = obj_lbl
-                else:
-                    raise NotImplementedError
-                
-                xmin1 = max(0., float(sbj_box[0]) / float(w))
-                xmax1 = min(1., float(sbj_box[2]) / float(w))
-                ymin1 = max(0., float(sbj_box[1]) / float(h))
-                ymax1 = min(1., float(sbj_box[3]) / float(h))
-
-                xmin2 = max(0., float(obj_box[0]) / float(w))
-                xmax2 = min(1., float(obj_box[2]) / float(w))
-                ymin2 = max(0., float(obj_box[1]) / float(h))
-                ymax2 = min(1., float(obj_box[3]) / float(h))
-
-                # remove singular boxes or boxes with one pixel width or height
-                if xmin1 >= xmax1 or ymin1 >= ymax1 or xmin2 >= xmax2 or ymin2 >= ymax2:
-                    continue
-
-                pred += '{} {} {} {} {} {} {} {} {} {} {} {} '.format(
-                    rel_score, lbl_s, xmin1, ymin1, xmax1, ymax1, lbl_o, xmin2, ymin2, xmax2, ymax2, lbl_p)
-
-            pred_str = pred.strip()
-            csvwriter.writerow([img_id, pred_str])
