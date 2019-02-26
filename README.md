@@ -15,13 +15,22 @@ The requirements are the same with [Detectron.pytorch](https://github.com/roytse
   * packaging
   * [pycocotools](https://github.com/cocodataset/cocoapi)
   * tensorboardX
-
   * tqdm
   * pillow
   * scikit-image
 * An NVIDIA GPU and CUDA 8.0 or higher. Some operations only have gpu implementation.
 
-A dockerfile with all necessary dependencies is included in docker/Dockerfile. 
+A dockerfile with all necessary dependencies is included in docker/Dockerfile. Requires nvidia-docker
+
+```
+# ROOT=path/to/cloned/repository
+cd $ROOT/docker
+# build the docker image and tag it
+docker build -t myname/mydockertag:1.0
+# launch an interactive session with this folder
+nvidia-docker run -v $ROOT:/workspace/visual-relationship-detection:rw -it myname/mydockertag:1.0
+# NOTE: you may need to mount other volumes depending on where your datasets are stored
+```
 
 ## Compilation
 Compile the CUDA code in the Detectron submodule and in the repo:
