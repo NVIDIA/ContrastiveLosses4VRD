@@ -20,7 +20,7 @@ The requirements are the same with [Detectron.pytorch](https://github.com/roytse
   * scikit-image
 * An NVIDIA GPU and CUDA 8.0 or higher. Some operations only have gpu implementation.
 
-A dockerfile with all necessary dependencies is included in docker/Dockerfile. Requires nvidia-docker
+* (Optional) A dockerfile with all necessary dependencies is included in docker/Dockerfile. Requires nvidia-docker
 
 ```
 # ROOT=path/to/cloned/repository
