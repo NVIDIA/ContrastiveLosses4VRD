@@ -155,7 +155,7 @@ The final directories for data and detection models should look like:
 ### OpenImages_mini
 To test a trained model using a ResNeXt-101-64x4d-FPN backbone, run
 ```
-python ./tools/test_net_rel.py --dataset oi_rel_mini --cfg configs/oi_rel/e2e_faster_rcnn_X-101-64x4d-FPN_12_epochs_oi_rel_mini_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5.yaml --load_ckpt trained_models/oi_mini_X-101-64x4d-FPN/model_step6749.pth --output_dir Outputs/oi_mini_X-101-64x4d-FPN --multi-gpu-testing --do_val
+python ./tools/test_net_rel.py --dataset oi_rel_mini --cfg configs/oi_rel_mini/e2e_faster_rcnn_X-101-64x4d-FPN_12_epochs_oi_rel_mini_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5.yaml --load_ckpt trained_models/oi_mini_X-101-64x4d-FPN/model_step6749.pth --output_dir Outputs/oi_mini_X-101-64x4d-FPN --multi-gpu-testing --do_val
 ```
 This should reproduce the numbers shown at the last line of Table 1 in the paper. 
 
