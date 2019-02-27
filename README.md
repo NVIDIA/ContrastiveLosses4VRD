@@ -87,7 +87,7 @@ Create the vrd folder under `data`:
 # ROOT=path/to/cloned/repository
 cd $ROOT/data/vrd
 ```
-Download the original annotation json files from [here](https://cs.stanford.edu/people/ranjaykrishna/vrd/) and unzip `json_dataset.zip` here. The images can be downloaded from [here](http://imagenet.stanford.edu/internal/jcjohns/scene_graphs/sg_dataset.zip). Unzip `sg_dataset.zip` to create an `sg_dataset` folder in `data/vrd`. Next run the preprocessing script:
+Download the original annotation json files from [here](https://cs.stanford.edu/people/ranjaykrishna/vrd/) and unzip `json_dataset.zip` here. The images can be downloaded from [here](http://imagenet.stanford.edu/internal/jcjohns/scene_graphs/sg_dataset.zip). Unzip `sg_dataset.zip` to create an `sg_dataset` folder in `data/vrd`. Go to `data/vrd`, within that folder download the official annotation files from [here](http://cs.stanford.edu/people/ranjaykrishna/vrd/json_dataset.zip) and unzip it. You should see four .json files and one readme.txt file decompressed there. Next run the preprocessing script:
 
 ```
 cd $ROOT
