@@ -94,7 +94,9 @@ cd $ROOT
 python tools/rename_vrd_with_numbers.py
 python tools/convert_vrd_anno_to_coco_format.py
 ```
-This script converts all non-jpg images (some images are in png or gif) to jpg, and renames them in the {:012d}.jpg format (e.g., "000000000001.jpg"). This is mostly to make things easier for the dataloader. The filename mapping from the original is stored in ``data/vrd/*_fname_mapping.json`` where ``*`` is either ``train`` or ``val``.
+`rename_vrd_with_numbers.py` converts all non-jpg images (some images are in png or gif) to jpg, and renames them in the {:012d}.jpg format (e.g., "000000000001.jpg"). It also creates new relationship annotations other than the original ones. This is mostly to make things easier for the dataloader. The filename mapping from the original is stored in `data/vrd/*_fname_mapping.json` where `*` is either `train` or `val`.
+
+`convert_vrd_anno_to_coco_format.py` creates object detection annotations from the new annotations generated above, which is required for feeding positive subject-object pairs during training.
 
 ## Pre-trained Object Detection Models
 Download pre-trained object detection models [here](https://drive.google.com/open?id=1NrqOLbMa_RwHbG3KIXJFWLnlND2kiIpj). Unzip it under the root directory. **Note:** We do not include code for training object detectors. Please refer to  [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch) for this.
