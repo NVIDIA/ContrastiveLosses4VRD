@@ -151,9 +151,7 @@ The final directories for data and detection models should look like:
 
 ## Evaluating Pre-trained Relationship Detection models
 
-DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to test with less or more than 8 GPUs.
-
-Use the environment variable CUDA_VISIBLE_DEVICES to control how many and which GPUs to use.
+DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to test with less or more than 8 GPUs. Use the environment variable CUDA_VISIBLE_DEVICES to control how many and which GPUs to use.
 
 ### OpenImages_mini
 To test a trained model using a ResNeXt-101-64x4d-FPN backbone, run
@@ -202,9 +200,7 @@ This should reproduce the numbers shown at the last line of Table 7.
 
 The section provides the command-line arguments to train our relationship detection models given the pre-trained object detection models described above. **Note:** We do not train object detectors here. We only use trained object detectors (provided in `detection_models/`) to initialize our to-be-trained relationship models.
 
-DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to train with less or more than 8 GPUs.
-
-Use the environment variable CUDA_VISIBLE_DEVICES to control how many and which GPUs to use.
+DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to train with less or more than 8 GPUs. Use the environment variable CUDA_VISIBLE_DEVICES to control how many and which GPUs to use.
 
 ### OpenImages_mini
 To train our relationship network using a ResNeXt-101-64x4d-FPN backbone, run
