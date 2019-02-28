@@ -169,7 +169,7 @@ python ./tools/test_net_rel.py --dataset oi_rel --cfg configs/oi_rel/e2e_faster_
 ```
 
 ### Visual Genome
-**NOTE:** May require a system of 64GB or more to evaluate on the visual genome test set
+**NOTE:** May require at least 64GB RAM to evaluate on the Visual Genome test set
 
 We use three evaluation metrics for VG: 1) SGDET: predict all the three labels and two boxes; 2) SGCLS: predict subject, object and predicate labels given ground truth subject and object boxes; 3) PRDCLS: predict predicate labels given ground truth subject and object boxes and labels.
 
