@@ -1,6 +1,6 @@
 # Adapted by Ji Zhang in 2019
 #
-# Written by Roy Tseng
+# Based on Detectron.pytorch/lib/roi_data/minibatch.py written by Roy Tseng
 
 import numpy as np
 import cv2
