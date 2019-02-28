@@ -93,7 +93,7 @@ cd $ROOT
 python tools/rename_vrd_with_numbers.py
 python tools/convert_vrd_anno_to_coco_format.py
 ```
-`rename_vrd_with_numbers.py` converts all non-jpg images (some images are in png or gif) to jpg, and renames them in the {:012d}.jpg format (e.g., "000000000001.jpg"). It also creates new relationship annotations other than the original ones. This is mostly to make things easier for the dataloader. The filename mapping from the original is stored in `data/vrd/*_fname_mapping.json` where * is either "train" or "val".
+`rename_vrd_with_numbers.py` converts all non-jpg images (some images are in png or gif) to jpg, and renames them in the {:012d}.jpg format (e.g., "000000000001.jpg"). It also creates new relationship annotations other than the original ones. This is mostly to make things easier for the dataloader. The filename mapping from the original is stored in `data/vrd/*_fname_mapping.json` where "*" is either "train" or "val".
 
 `convert_vrd_anno_to_coco_format.py` creates object detection annotations from the new annotations generated above, which is required for feeding positive subject-object pairs during training.
 
