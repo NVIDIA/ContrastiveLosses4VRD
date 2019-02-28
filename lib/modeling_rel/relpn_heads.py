@@ -54,28 +54,16 @@ class single_scale_relpn_outputs(nn.Module):
         
         # Get pairwise proposals first
         if roidb is not None:
-            sbj_rois = np.empty((0, det_rois.shape[1]), dtype=det_rois.dtype)
-            obj_rois = np.empty((0, det_rois.shape[1]), dtype=det_rois.dtype)
-            for i in range(len(roidb)):
-                idx = np.where(det_rois[:, 0] == i)[0]
-                im_det_rois = det_rois[idx, :]
-                sbj_inds = np.repeat(np.arange(im_det_rois.shape[0]), im_det_rois.shape[0])
-                obj_inds = np.tile(np.arange(im_det_rois.shape[0]), im_det_rois.shape[0])
-                # remove self paired rois
-                if im_det_rois.shape[0] > 1:  # no pairs to remove when there is at most one detection
-                    sbj_inds, obj_inds = self.remove_self_pairs(im_det_rois.shape[0], sbj_inds, obj_inds)
-                im_sbj_rois = im_det_rois[sbj_inds]
-                im_obj_rois = im_det_rois[obj_inds]
-                sbj_rois = np.append(sbj_rois, im_sbj_rois, axis=0)
-                obj_rois = np.append(obj_rois, im_obj_rois, axis=0)
-        else:
-            sbj_inds = np.repeat(np.arange(det_rois.shape[0]), det_rois.shape[0])
-            obj_inds = np.tile(np.arange(det_rois.shape[0]), det_rois.shape[0])
-            # remove self paired rois
-            if det_rois.shape[0] > 1:  # no pairs to remove when there is at most one detection
-                sbj_inds, obj_inds = self.remove_self_pairs(det_rois.shape[0], sbj_inds, obj_inds)
-            sbj_rois = det_rois[sbj_inds]
-            obj_rois = det_rois[obj_inds]
+            # we always feed one image per batch during training
+            assert len(roidb) == 1
+
+        sbj_inds = np.repeat(np.arange(det_rois.shape[0]), det_rois.shape[0])
+        obj_inds = np.tile(np.arange(det_rois.shape[0]), det_rois.shape[0])
+        # remove self paired rois
+        if det_rois.shape[0] > 1:  # no pairs to remove when there is at most one detection
+            sbj_inds, obj_inds = self.remove_self_pairs(det_rois.shape[0], sbj_inds, obj_inds)
+        sbj_rois = det_rois[sbj_inds]
+        obj_rois = det_rois[obj_inds]
             
         im_scale = im_info.data.numpy()[:, 2][0]
         sbj_boxes = sbj_rois[:, 1:] / im_scale

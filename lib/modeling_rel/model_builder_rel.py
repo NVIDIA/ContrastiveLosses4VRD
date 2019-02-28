@@ -22,6 +22,7 @@ import modeling_rel.fast_rcnn_heads as fast_rcnn_heads
 import modeling_rel.relpn_heads as relpn_heads
 import modeling_rel.reldn_heads as reldn_heads
 import modeling_rel.rel_pyramid_module as rel_pyramid_module
+import utils_rel.boxes_rel as box_utils_rel
 import utils.boxes as box_utils
 import utils.blob as blob_utils
 import utils_rel.net_rel as net_utils_rel
@@ -340,7 +341,7 @@ class Generalized_RCNN(nn.Module):
                 repeated_batch_idx = 0 * blob_utils.ones((sbj_rois.shape[0], 1))
                 sbj_rois = np.hstack((repeated_batch_idx, sbj_rois))
                 obj_rois = np.hstack((repeated_batch_idx, obj_rois))
-                rel_rois = box_utils.rois_union(sbj_rois, obj_rois)
+                rel_rois = box_utils_rel.rois_union(sbj_rois, obj_rois)
                 rel_ret = {}
                 rel_ret['sbj_rois'] = sbj_rois
                 rel_ret['obj_rois'] = obj_rois
@@ -379,7 +380,7 @@ class Generalized_RCNN(nn.Module):
                 rel_ret['all_sbj_labels_int32'] = sbj_labels.astype(np.int32, copy=False)
                 rel_ret['all_obj_labels_int32'] = obj_labels.astype(np.int32, copy=False)
                 if cfg.MODEL.USE_SPATIAL_FEAT:
-                    spt_feat = box_utils.get_spt_features(sbj_boxes, obj_boxes, im_w, im_h)
+                    spt_feat = box_utils_rel.get_spt_features(sbj_boxes, obj_boxes, im_w, im_h)
                     rel_ret['spt_feat'] = spt_feat
                 if cfg.MODEL.ADD_SO_SCORES:
                     sbj_feat = self.S_Head(blob_conv, rel_ret, rois_name='sbj_rois', use_relu=use_relu)

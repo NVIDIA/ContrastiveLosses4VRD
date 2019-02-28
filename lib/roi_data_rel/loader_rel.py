@@ -1,6 +1,6 @@
-# Adapted by Ji Zhang in 2019
+# Adapted by Ji Zhang for this project in 2019
 #
-# Written by Roy Tseng
+# Based on Detectron.Pytorch/lib/roi/loader.py by Roy Tseng
 
 import math
 import numpy as np

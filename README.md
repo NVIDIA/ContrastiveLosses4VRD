@@ -93,11 +93,10 @@ Download the original annotation json files from [here](https://cs.stanford.edu/
 cd $ROOT
 python tools/rename_vrd_with_numbers.py
 ```
-This script does two things: 1) convert image "2743361338_3d1a1e3b93_o.png" and "4392556686_44d71ff5a0_o.gif" to .jpg format, and rename all images to the "{:012d}.jpg" format, e.g., "000000000001.jpg". 2) New annotations are created accordingly which will be used by this repo. This is simply for data cleaning purpose and for consistency of the format used by our dataloader.
-
+This script converts all non-jpg images ("2743361338_3d1a1e3b93_o.png" and "4392556686_44d71ff5a0_o.gif") to jpg, and renames them in the {:012d}.jpg format (e.g., "000000000001.jpg"). This is mostly to make things easier for the dataloader. The filename mapping from the original is stored in ``data/vrd/*_fname_mapping.json`` where ``*`` is either ``train`` or ``val``.
 
 ## Pre-trained Object Detection Models
-Download pre-trained object detection models [here](https://drive.google.com/open?id=1NrqOLbMa_RwHbG3KIXJFWLnlND2kiIpj). Unzip it under the root directory. We do not include code for training object detectors. If you have such need, please refer to [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch).
+Download pre-trained object detection models [here](https://drive.google.com/open?id=1NrqOLbMa_RwHbG3KIXJFWLnlND2kiIpj). Unzip it under the root directory. **Note:** We do not include code for training object detectors. Please refer to  [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch) for this.
 
 ## Our Trained Relationship Detection Models
 Download our trained models [here](https://drive.google.com/open?id=1mVnkZXdlg1ClVF5cGrSgQm31Q3Z0ZcNX). Unzip it under the root folder and you should see a `trained_models` folder there.
@@ -150,7 +149,11 @@ The final directories for data and detection models should look like:
 |   |   |-- model_step7559.pth
 ```
 
-## Evaluating Pre-trained models
+## Evaluating Pre-trained Relationship Detection models
+
+DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to test with less or more than 8 GPUs.
+
+Use the environment variable CUDA_VISIBLE_DEVICES to control how many and which GPUs to use.
 
 ### OpenImages_mini
 To test a trained model using a ResNeXt-101-64x4d-FPN backbone, run
@@ -166,63 +169,75 @@ python ./tools/test_net_rel.py --dataset oi_rel --cfg configs/oi_rel/e2e_faster_
 ```
 
 ### Visual Genome
-To test a trained model using a VGG16 backbone, run
-```
-python ./tools/test_net_rel.py --dataset vg --cfg configs/vg/e2e_faster_rcnn_VGG16_8_epochs_vg_v3_default_two_level_use_so_separate_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_no_spt.yaml --load_ckpt trained_models/vg_VGG16/model_step62722.pth --output_dir Outputs/vg_VGG16 --multi-gpu-testing --do_val
-```
-This should reproduce the numbers shown at the last line of Table 6 in the paper. 
+**NOTE:** May require a system of 64GB or more to evaluate on the visual genome test set
 
-To test a trained model using a vg_X-101-64x4d-FPN backbone, run
+We use three evaluation metrics for VG: 1) SGDET: predict all the three labels and two boxes; 2) SGCLS: predict subject, object and predicate labels given ground truth subject and object boxes; 3) PRDCLS: predict predicate labels given ground truth subject and object boxes and labels.
+
+To test a trained model using a VGG16 backbone with "SGDET", run
+```
+python ./tools/test_net_rel.py --dataset vg --cfg configs/vg/e2e_faster_rcnn_VGG16_8_epochs_vg_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_no_spt.yaml --load_ckpt trained_models/vg_VGG16/model_step62722.pth --output_dir Outputs/vg_VGG16 --multi-gpu-testing --do_val
+```
+Use `--use_gt_boxes` option to test it with "SGCLS"; use `--use_gt_boxes --use_gt_labels` options to test it with "PRDCLS". This should reproduce the numbers shown at the last line of Table 6 in the paper.
+
+To test a trained model using a vg_X-101-64x4d-FPN backbone with "SGDET", run
 ```
 python ./tools/test_net_rel.py --dataset vg --cfg configs/vg/e2e_faster_rcnn_X-101-64x4d-FPN_8_epochs_vg_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5.yaml --load_ckpt trained_models/vg_X-101-64x4d-FPN/model_step62722.pth --output_dir Outputs/vg_X-101-64x4d-FPN --multi-gpu-testing --do_val
 ```
-This should reproduce the numbers shown at the last line of Table 1 in the supplementary.
+Use `--use_gt_boxes` option to test it with "SGCLS"; use `--use_gt_boxes --use_gt_labels` options to test it with "PRDCLS". This should reproduce the numbers shown at the last line of Table 1 in the supplementary.
 
 ### Visual Relation Detection
 To test a trained model initialized by an ImageNet pre-trained VGG16 model, run
 ```
-python ./tools/test_net_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rcnn_VGG16_16_epochs_vrd_v3_default_two_level_use_so_separate_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_IN_pretrained.yaml --load_ckpt trained_models/vrd_VGG16_IN_pretrained/model_step7559.pth --output_dir Outputs/vrd_VGG16_IN_pretrained --multi-gpu-testing --do_val
+python ./tools/test_net_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rcnn_VGG16_16_epochs_vrd_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_IN_pretrained.yaml --load_ckpt trained_models/vrd_VGG16_IN_pretrained/model_step7559.pth --output_dir Outputs/vrd_VGG16_IN_pretrained --multi-gpu-testing --do_val
 ```
 This should reproduce the numbers shown at the second to the last line of Table 7.
 
 To test a trained model initialized by an COCO pre-trained VGG16 model, run
 ```
-python ./tools/test_net_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rcnn_VGG16_16_epochs_vrd_v3_default_two_level_use_so_separate_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_COCO_pretrained.yaml --load_ckpt trained_models/vrd_VGG16_COCO_pretrained/model_step7559.pth --output_dir Outputs/vrd_VGG16_COCO_pretrained --multi-gpu-testing --do_val
+python ./tools/test_net_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rcnn_VGG16_16_epochs_vrd_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_COCO_pretrained.yaml --load_ckpt trained_models/vrd_VGG16_COCO_pretrained/model_step7559.pth --output_dir Outputs/vrd_VGG16_COCO_pretrained --multi-gpu-testing --do_val
 ```
 This should reproduce the numbers shown at the last line of Table 7.
 
-## Training from scratch
+## Training Relationship Detection Models
+
+The section provides the command-line arguments to train our relationship detection models given the pre-trained object detection models described above. **Note:** We do not train object detectors here. We only use trained object detectors (provided in `detection_models/`) to initialize our to-be-trained relationship models.
+
+DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to train with less or more than 8 GPUs.
+
+Use the environment variable CUDA_VISIBLE_DEVICES to control how many and which GPUs to use.
 
 ### OpenImages_mini
-To train our network using a ResNeXt-101-64x4d-FPN backbone, run
+To train our relationship network using a ResNeXt-101-64x4d-FPN backbone, run
 ```
 python tools/train_net_step_rel.py --dataset oi_rel_mini --cfg configs/oi_rel_mini/e2e_faster_rcnn_X-101-64x4d-FPN_12_epochs_oi_rel_mini_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5.yaml --nw 8 --use_tfboard
 ```
 
 ### OpenImages
-To train our network using a ResNeXt-101-64x4d-FPN backbone, run
+To train our relationship network using a ResNeXt-101-64x4d-FPN backbone, run
 ```
 python tools/train_net_step_rel.py --dataset oi_rel --cfg configs/oi_rel/e2e_faster_rcnn_X-101-64x4d-FPN_12_epochs_oi_rel_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5.yaml --nw 8 --use_tfboard
 ```
 
 ### Visual Genome
-To train our network using a VGG16 backbone, run
+To train our relationship network using a VGG16 backbone, run
 ```
-python tools/train_net_step_rel.py --dataset vg --cfg configs/vg/e2e_faster_rcnn_VGG16_8_epochs_vg_v3_default_two_level_use_so_separate_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_no_spt.yaml --nw 8 --use_tfboard
+python tools/train_net_step_rel.py --dataset vg --cfg configs/vg/e2e_faster_rcnn_VGG16_8_epochs_vg_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_no_spt.yaml --nw 8 --use_tfboard
 ```
-To train our network using a ResNeXt-101-64x4d-FPN backbone, run
+To train our relationship network using a ResNeXt-101-64x4d-FPN backbone, run
 ```
 python tools/train_net_step_rel.py --dataset vg --cfg configs/vg/e2e_faster_rcnn_X-101-64x4d-FPN_8_epochs_vg_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5.yaml --nw 8 --use_tfboard
 ```
 
 ### Visual Relation Detection
-To train our network initialized by an ImageNet pre-trained VGG16 model, run
+To train our relationship network initialized by an ImageNet pre-trained VGG16 model, run
 ```
 python tools/train_net_step_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rcnn_VGG16_16_epochs_vrd_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_IN_pretrained.yaml --nw 8 --use_tfboard
 ```
-To train our network initialized by a COCO pre-trained VGG16 model, run
+To train our relationship network initialized by a COCO pre-trained VGG16 model, run
 ```
 python tools/train_net_step_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rcnn_VGG16_16_epochs_vrd_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_COCO_pretrained.yaml --nw 8 --use_tfboard
 ```
 
-## References
+## Acknowledgements
+This repository uses code based on the [Neural-Motifs](https://github.com/rowanz/neural-motifs) source code from Rowan Zellers, as well as
+code from the [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch) repository by Roy Tseng. See LICENSES for additional details.

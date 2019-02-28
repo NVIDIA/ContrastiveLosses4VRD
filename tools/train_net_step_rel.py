@@ -184,12 +184,12 @@ def main():
         cfg_from_list(args.set_cfgs)
 
     ### Adaptively adjust some configs ###
+    cfg.NUM_GPUS = torch.cuda.device_count()
     original_batch_size = cfg.NUM_GPUS * cfg.TRAIN.IMS_PER_BATCH
     original_ims_per_batch = cfg.TRAIN.IMS_PER_BATCH
     original_num_gpus = cfg.NUM_GPUS
     if args.batch_size is None:
         args.batch_size = original_batch_size
-    cfg.NUM_GPUS = torch.cuda.device_count()
     assert (args.batch_size % cfg.NUM_GPUS) == 0, \
         'batch_size: %d, NUM_GPUS: %d' % (args.batch_size, cfg.NUM_GPUS)
     cfg.TRAIN.IMS_PER_BATCH = args.batch_size // cfg.NUM_GPUS
