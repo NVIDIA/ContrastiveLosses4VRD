@@ -5,7 +5,6 @@ The requirements are the same with [Detectron.pytorch](https://github.com/roytse
 * Python 3
 * Python packages
   * pytorch 0.4.0 or 0.4.1.post2 (not guaranteed to work on newer versions)
-  * torchvision
   * cython
   * matplotlib
   * numpy
@@ -94,7 +93,7 @@ cd $ROOT
 python tools/rename_vrd_with_numbers.py
 python tools/convert_vrd_anno_to_coco_format.py
 ```
-`rename_vrd_with_numbers.py` converts all non-jpg images (some images are in png or gif) to jpg, and renames them in the {:012d}.jpg format (e.g., "000000000001.jpg"). It also creates new relationship annotations other than the original ones. This is mostly to make things easier for the dataloader. The filename mapping from the original is stored in `data/vrd/*_fname_mapping.json` where `*` is either `train` or `val`.
+`rename_vrd_with_numbers.py` converts all non-jpg images (some images are in png or gif) to jpg, and renames them in the {:012d}.jpg format (e.g., "000000000001.jpg"). It also creates new relationship annotations other than the original ones. This is mostly to make things easier for the dataloader. The filename mapping from the original is stored in `data/vrd/*_fname_mapping.json` where * is either "train" or "val".
 
 `convert_vrd_anno_to_coco_format.py` creates object detection annotations from the new annotations generated above, which is required for feeding positive subject-object pairs during training.
 
@@ -154,7 +153,7 @@ The final directories for data and detection models should look like:
 
 ## Evaluating Pre-trained Relationship Detection models
 
-DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to test with less or more than 8 GPUs. Use the environment variable CUDA_VISIBLE_DEVICES to control how many and which GPUs to use.
+DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to test with less or more than 8 GPUs. Use the environment variable `CUDA_VISIBLE_DEVICES` to control how many and which GPUs to use.
 
 ### OpenImages_mini
 To test a trained model using a ResNeXt-101-64x4d-FPN backbone, run
@@ -203,7 +202,7 @@ This should reproduce the numbers shown at the last line of Table 7.
 
 The section provides the command-line arguments to train our relationship detection models given the pre-trained object detection models described above. **Note:** We do not train object detectors here. We only use trained object detectors (provided in `detection_models/`) to initialize our to-be-trained relationship models.
 
-DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to train with less or more than 8 GPUs. Use the environment variable CUDA_VISIBLE_DEVICES to control how many and which GPUs to use.
+DO NOT CHANGE anything in the provided config files(configs/xx/xxxx.yaml) even if you want to train with less or more than 8 GPUs. Use the environment variable `CUDA_VISIBLE_DEVICES` to control how many and which GPUs to use.
 
 ### OpenImages_mini
 To train our relationship network using a ResNeXt-101-64x4d-FPN backbone, run
