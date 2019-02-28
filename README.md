@@ -120,8 +120,8 @@ The final directories for data and detection models should look like:
 |   |   |   |-- model_step4499.pth
 |-- data
 |   |-- openimages_v4
-|   |   |-- rel
 |   |   |-- train    <-- (contains OpenImages_v4 training/validation images)
+|   |   |-- rel
 |   |   |   |-- rel_only_annotations_train.json
 |   |   |   |-- rel_only_annotations_val.json
 |   |   |   |-- ...
