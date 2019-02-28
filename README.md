@@ -87,11 +87,12 @@ Create the vrd folder under `data`:
 # ROOT=path/to/cloned/repository
 cd $ROOT/data/vrd
 ```
-Download the original annotation json files from [here](https://cs.stanford.edu/people/ranjaykrishna/vrd/) and unzip `json_dataset.zip` here. The images can be downloaded from [here](http://imagenet.stanford.edu/internal/jcjohns/scene_graphs/sg_dataset.zip). Unzip `sg_dataset.zip` to create an `sg_dataset` folder in `data/vrd`. Next run the preprocessing script:
+Download the original annotation json files from [here](https://cs.stanford.edu/people/ranjaykrishna/vrd/) and unzip `json_dataset.zip` here. The images can be downloaded from [here](http://imagenet.stanford.edu/internal/jcjohns/scene_graphs/sg_dataset.zip). Unzip `sg_dataset.zip` to create an `sg_dataset` folder in `data/vrd`. Next run the preprocessing scripts:
 
 ```
 cd $ROOT
 python tools/rename_vrd_with_numbers.py
+python tools/convert_vrd_anno_to_coco_format.py
 ```
 This script converts all non-jpg images (some images are in png or gif) to jpg, and renames them in the {:012d}.jpg format (e.g., "000000000001.jpg"). This is mostly to make things easier for the dataloader. The filename mapping from the original is stored in ``data/vrd/*_fname_mapping.json`` where ``*`` is either ``train`` or ``val``.
 
