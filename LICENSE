@@ -27,8 +27,10 @@ Unless otherwise stated, all files are released under the following license:
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-The license for files from the Detectron.pytorch git submodule can be found in
-Detectron.pytorch/LICENSE
+The license for files within Detectron_pytorch git submodule can be found in
+Detectron.pytorch/LICENSE. This license also applies to our source files derived from
+those in Detectron.pytorch and written by Roy Tseng. Additional information will
+be included in the header of all derived source files.
 
 Additional code is derived from the Neural-Motifs repository by Rowan Zellers:
 https://github.com/rowanz/neural-motifs
