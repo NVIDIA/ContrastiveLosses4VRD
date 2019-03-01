@@ -1,3 +1,6 @@
+# Based on Detectron.pytorch/tools/_init_paths.py by Roy Tseng
+# modified for this project by Ji Zhang
+
 """Add {PROJECT_ROOT}/lib. to PYTHONPATH
 
 Usage:
