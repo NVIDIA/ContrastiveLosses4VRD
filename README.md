@@ -177,26 +177,26 @@ To test a trained model using a VGG16 backbone with "SGDET", run
 ```
 python ./tools/test_net_rel.py --dataset vg --cfg configs/vg/e2e_faster_rcnn_VGG16_8_epochs_vg_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_no_spt.yaml --load_ckpt trained_models/vg_VGG16/model_step62722.pth --output_dir Outputs/vg_VGG16 --multi-gpu-testing --do_val
 ```
-Use `--use_gt_boxes` option to test it with "SGCLS"; use `--use_gt_boxes --use_gt_labels` options to test it with "PRDCLS". This should reproduce the numbers shown at the last line of Table 6 in the paper.
+Use `--use_gt_boxes` option to test it with "SGCLS"; use `--use_gt_boxes --use_gt_labels` options to test it with "PRDCLS". The results are slightly different with those at the last line of Table 6 in the paper.
 
 To test a trained model using a vg_X-101-64x4d-FPN backbone with "SGDET", run
 ```
 python ./tools/test_net_rel.py --dataset vg --cfg configs/vg/e2e_faster_rcnn_X-101-64x4d-FPN_8_epochs_vg_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5.yaml --load_ckpt trained_models/vg_X-101-64x4d-FPN/model_step62722.pth --output_dir Outputs/vg_X-101-64x4d-FPN --multi-gpu-testing --do_val
 ```
-Use `--use_gt_boxes` option to test it with "SGCLS"; use `--use_gt_boxes --use_gt_labels` options to test it with "PRDCLS". This should reproduce the numbers shown at the last line of Table 1 in the supplementary.
+Use `--use_gt_boxes` option to test it with "SGCLS"; use `--use_gt_boxes --use_gt_labels` options to test it with "PRDCLS". The results are slightly different with those at the last line of Table 1 in the supplementary.
 
 ### Visual Relation Detection
 To test a trained model initialized by an ImageNet pre-trained VGG16 model, run
 ```
 python ./tools/test_net_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rcnn_VGG16_16_epochs_vrd_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_IN_pretrained.yaml --load_ckpt trained_models/vrd_VGG16_IN_pretrained/model_step7559.pth --output_dir Outputs/vrd_VGG16_IN_pretrained --multi-gpu-testing --do_val
 ```
-This should reproduce the numbers shown at the second to the last line of Table 7.
+The results are slightly different with those at the second to the last line of Table 7.
 
 To test a trained model initialized by an COCO pre-trained VGG16 model, run
 ```
 python ./tools/test_net_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rcnn_VGG16_16_epochs_vrd_v3_default_node_contrastive_loss_w_so_p_aware_margin_point2_so_weight_point5_COCO_pretrained.yaml --load_ckpt trained_models/vrd_VGG16_COCO_pretrained/model_step7559.pth --output_dir Outputs/vrd_VGG16_COCO_pretrained --multi-gpu-testing --do_val
 ```
-This should reproduce the numbers shown at the last line of Table 7.
+The results are slightly different with those at the last line of Table 7.
 
 ## Training Relationship Detection Models
 
