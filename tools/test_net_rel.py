@@ -1,6 +1,6 @@
 # Adapted by Ji Zhang, 2019
 #
-# Based on test_net.py Written by Roy Tseng
+# Based on Detectron.pytorch/tools/test_net.py Written by Roy Tseng
 
 """Perform inference on one or more datasets."""
 

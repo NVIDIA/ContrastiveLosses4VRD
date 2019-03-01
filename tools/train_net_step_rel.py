@@ -1,6 +1,6 @@
 # Adapted by Ji Zhang, 2019
 #
-# Based on train_net.py Written by Roy Tseng
+# Based on Detectron.pytorch/tools/train_net.py Written by Roy Tseng
 
 """ Training script for steps_with_decay policy"""
 
