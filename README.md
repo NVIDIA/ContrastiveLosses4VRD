@@ -49,6 +49,7 @@ Create a data folder at the top-level directory of the repository:
 cd $ROOT
 mkdir data
 ```
+If necessary, one may edit the `DATA_DIR` field in lib/core/config.py to change the expected path to the data directory.
 
 ### OpenImages/OpenImages_mini
 Download it [here](https://drive.google.com/open?id=1GeUEsiS9Z3eRYnH1GPUz99wjQwjcHl6n). Unzip it under the data folder. You should see an `openimages_v4` folder unzipped there. It contains .json annotation files for both OpenImages and OpenImages_mini, which is a subset of the former created by us including 4500 train and 1000 test images. The .json files are created based on the original .csv annotations.
