@@ -1,5 +1,7 @@
 # Graphical Contrastive Losses for Scene Graph Generation
 
+This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Graph Generation, CVPR2019](https://arxiv.org/abs/1903.02728).
+
 ## Requirements
 The requirements are the same with [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch):
 * Python 3
@@ -248,3 +250,13 @@ python tools/train_net_step_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rc
 ## Acknowledgements
 This repository uses code based on the [Neural-Motifs](https://github.com/rowanz/neural-motifs) source code from Rowan Zellers, as well as
 code from the [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch) repository by Roy Tseng. See LICENSES for additional details.
+
+## Citing Graphical_Contrastive_VRD
+If you use this code in your research, please use the following BibTeX entry.
+```
+@conference{zhang2019vrd,
+  title={Graphical Contrastive Losses for Scene Graph Generation},
+  author={Zhang, Ji and Shih, Kevin J. and Elgammal, Ahmed and Tao, Andrew and Catanzaro, Bryan},
+  booktitle={CVPR},
+  year={2019}
+}
