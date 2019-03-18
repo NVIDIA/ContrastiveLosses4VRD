@@ -256,7 +256,7 @@ python tools/train_net_step_rel.py --dataset vrd --cfg configs/vrd/e2e_faster_rc
 This repository uses code based on the [Neural-Motifs](https://github.com/rowanz/neural-motifs) source code from Rowan Zellers, as well as
 code from the [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch) repository by Roy Tseng. See LICENSES for additional details.
 
-## Citing Graphical_Contrastive_SGG
+## Citing
 If you use this code in your research, please use the following BibTeX entry.
 ```
 @conference{zhang2019vrd,
