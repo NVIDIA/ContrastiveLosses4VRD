@@ -1,6 +1,11 @@
 # Graphical Contrastive Losses for Scene Graph Generation
 
 This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Graph Generation, CVPR2019](https://arxiv.org/abs/1903.02728).
+## Cloning
+```
+git clone https://github.com/NVIDIA/ContrastiveLosses4VRD.git --recurse-submodules
+
+```
 
 ## Requirements
 The requirements are the same with [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytorch):
