@@ -25,6 +25,13 @@ git clone https://github.com/NVIDIA/ContrastiveLosses4VRD.git --recurse-submodul
   * scikit-image
 * An NVIDIA GPU and CUDA 8.0 or higher. Some operations only have gpu implementation.
 
+An easy installation if you already have Python 3 and CUDA 9.0:
+```
+conda install pytorch=0.4.1
+pip install cython matplotlib numpy scipy pyyaml packaging pycocotools tensorboardX tqdm pillow scikit-image
+conda install opencv
+```
+
 * (Optional) A dockerfile with all necessary dependencies is included in docker/Dockerfile. Requires nvidia-docker
 
 ```
