@@ -67,12 +67,10 @@ __C.TRAIN.IMS_PER_BATCH = 2
 __C.TRAIN.BATCH_SIZE_PER_IM = 64
 
 __C.TRAIN.FG_REL_SIZE_PER_IM = 512
-__C.TRAIN.FG_ATT_SIZE_PER_IM = 512
 
 # Fraction of minibatch that is labeled foreground (i.e. class > 0)
 __C.TRAIN.FG_FRACTION = 0.25
 __C.TRAIN.FG_REL_FRACTION = 0.25
-__C.TRAIN.FG_ATT_FRACTION = 0.25
 
 # Overlap threshold for a ROI to be considered foreground (if >= FG_THRESH)
 __C.TRAIN.FG_THRESH = 0.5
@@ -473,7 +471,6 @@ __C.MODEL.USE_SPO_AGNOSTIC_COMPENSATION = False
 # E.g., 81 for COCO (80 foreground + 1 background)
 __C.MODEL.NUM_CLASSES = -1
 __C.MODEL.NUM_PRD_CLASSES = -1
-__C.MODEL.NUM_ATT_CLASSES = -1
 
 # Use a class agnostic bounding box regressor instead of the default per-class
 # regressor
@@ -981,7 +978,6 @@ __C.RESNETS.COCO_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.OI_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.OI_REL_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.OI_REL_PRD_PRETRAINED_WEIGHTS = ''
-__C.RESNETS.OI_ATT_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.VRD_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.VRD_PRD_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.VG_PRETRAINED_WEIGHTS = ''
