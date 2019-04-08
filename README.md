@@ -5,6 +5,8 @@ This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Gra
 ![alt text](https://github.com/NVIDIA/ContrastiveLosses4VRD/blob/master/Loss_illustration.PNG)
 Example results of RelDN with without and with our losses. "L0 only" means using only the original multi-class logistic loss (without our losses). The top row shows RelDN outputs and the bottom row visualizes the learned predicate CNN features of the two models. Red and green boxes highlight the wrong and right outputs (the first row) or feature saliency (the second row).
 
+![alt text](https://github.com/NVIDIA/ContrastiveLosses4VRD/blob/master/Examples.PNG)
+
 ## Cloning
 ```
 git clone https://github.com/NVIDIA/ContrastiveLosses4VRD.git --recurse-submodules
