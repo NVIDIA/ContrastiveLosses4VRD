@@ -1,7 +1,7 @@
 # Graphical Contrastive Losses for Scene Graph Generation
 
 ![alt text](https://github.com/NVIDIA/ContrastiveLosses4VRD/blob/master/Examples.PNG)
-<p align="center">Example results from the VG80K dataset.</p>
+<p align="center">Example results from the OpenImages dataset.</p>
 
 ![alt text](https://github.com/NVIDIA/ContrastiveLosses4VRD/blob/master/Loss_illustration.PNG)
 Example results of RelDN with without and with our losses. "L0 only" means using only the original multi-class logistic loss (without our losses). The top row shows RelDN outputs and the bottom row visualizes the learned predicate CNN features of the two models. Red and green boxes highlight the wrong and right outputs (the first row) or feature saliency (the second row).
