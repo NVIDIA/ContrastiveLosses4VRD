@@ -1,4 +1,4 @@
-# Graphical Contrastive Losses for Scene Graph Generation
+# Graphical Contrastive Losses for Scene Graph Parsing
 
 ![alt text](https://github.com/NVIDIA/ContrastiveLosses4VRD/blob/master/Examples.PNG)
 <p align="center">Example results from the OpenImages dataset.</p>
@@ -6,7 +6,7 @@
 ![alt text](https://github.com/NVIDIA/ContrastiveLosses4VRD/blob/master/Loss_illustration.PNG)
 Example results of RelDN with without and with our losses. "L0 only" means using only the original multi-class logistic loss (without our losses). The top row shows RelDN outputs and the bottom row visualizes the learned predicate CNN features of the two models. Red and green boxes highlight the wrong and right outputs (the first row) or feature saliency (the second row).
 
-This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Graph Generation, CVPR2019](https://arxiv.org/abs/1903.02728). This is an improved version of the code that won the 1st place in the [Google AI Open Images Visual Relationship Detection Chanllenge](https://www.kaggle.com/c/google-ai-open-images-visual-relationship-track/leaderboard).
+This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Graph Parsing, CVPR2019](https://arxiv.org/abs/1903.02728). This is an improved version of the code that won the 1st place in the [Google AI Open Images Visual Relationship Detection Chanllenge](https://www.kaggle.com/c/google-ai-open-images-visual-relationship-track/leaderboard).
 
 ## Cloning
 ```
@@ -273,7 +273,7 @@ code from the [Detectron.pytorch](https://github.com/roytseng-tw/Detectron.pytor
 If you use this code in your research, please use the following BibTeX entry.
 ```
 @conference{zhang2019vrd,
-  title={Graphical Contrastive Losses for Scene Graph Generation},
+  title={Graphical Contrastive Losses for Scene Graph Parsing},
   author={Zhang, Ji and Shih, Kevin J. and Elgammal, Ahmed and Tao, Andrew and Catanzaro, Bryan},
   booktitle={CVPR},
   year={2019}
