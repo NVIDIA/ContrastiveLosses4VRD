@@ -35,7 +35,8 @@ git clone https://github.com/NVIDIA/ContrastiveLosses4VRD.git --recurse-submodul
 An easy installation if you already have Anaconda Python 3 and CUDA 9.0:
 ```
 conda install pytorch=0.4.1
-pip install cython matplotlib numpy scipy pyyaml packaging pycocotools tensorboardX tqdm pillow scikit-image
+pip install cython
+pip install matplotlib numpy scipy pyyaml packaging pycocotools tensorboardX tqdm pillow scikit-image
 conda install opencv
 ```
 
