@@ -31,8 +31,8 @@ import datetime
 import numpy as np
 
 from core.config import cfg
-from utils_rel.logging_rel import log_stats
-from utils_rel.logging_rel import SmoothedValue
+from utils_rel.logging_att import log_stats
+from utils_rel.logging_att import SmoothedValue
 from utils.timer import Timer
 import utils.net as nu
 

@@ -1,0 +1,231 @@
+# Adapted from Detectron.pytorch/lib/datasets/dataset_catalog.py
+# for this project by Ji Zhang,2019
+#-----------------------------------------------------------------------------
+# Copyright (c) 2017-present, Facebook, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+##############################################################################
+
+"""Collection of available datasets."""
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import os
+
+from core.config import cfg
+
+# Path to data dir
+_DATA_DIR = cfg.DATA_DIR
+
+# Required dataset entry keys
+IM_DIR = 'image_directory'
+ANN_FN = 'annotation_file'
+ANN_FN2 = 'annotation_file2'
+ANN_FN3 = 'predicate_file'
+
+# Optional dataset entry keys
+IM_PREFIX = 'image_prefix'
+DEVKIT_DIR = 'devkit_directory'
+RAW_DIR = 'raw_dir'
+
+# Available datasets
+DATASETS = {
+    # OpenImages_v4 att dataset for attribute task
+    'oi_att_train': {
+        IM_DIR:
+            _DATA_DIR + '/openimages_v4/train',
+        ANN_FN:
+            _DATA_DIR + '/openimages_v4/rel/detections_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/att_only_annotations_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/att_5_attributes.json',
+    },
+    'oi_att_train_mini': {
+        IM_DIR:
+            _DATA_DIR + '/openimages_v4/train',
+        ANN_FN:
+            _DATA_DIR + '/openimages_v4/rel/detections_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/att_only_annotations_train_mini.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/att_5_attributes.json',
+    },
+    'oi_att_val': {
+        IM_DIR:
+            _DATA_DIR + '/openimages_v4/train',
+        ANN_FN:
+            _DATA_DIR + '/openimages_v4/rel/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/att_only_annotations_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/att_5_attributes.json',
+    },
+    'oi_att_val_mini': {
+        IM_DIR:
+            _DATA_DIR + '/openimages_v4/train',
+        ANN_FN:
+            _DATA_DIR + '/openimages_v4/rel/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/att_only_annotations_val_mini.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/att_5_attributes.json',
+    },
+    'oi_all_att_val': {
+        IM_DIR:
+            _DATA_DIR + '/openimages_v4/train',
+        ANN_FN:
+            _DATA_DIR + '/openimages_v4/rel/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/all_att_only_annotations_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/att_5_attributes.json',
+    },
+    # for Kaggle test
+    'oi_kaggle_att_test': {
+        IM_DIR:
+            _DATA_DIR + '/openimages_v4/rel/kaggle_test_images/challenge2018_test',
+        ANN_FN:  # pseudo annotation
+            _DATA_DIR + '/openimages_v4/rel/kaggle_test_images/detections_test.json',
+        ANN_FN2:
+            _DATA_DIR + '/openimages_v4/rel/kaggle_test_images/all_att_only_annotations_test.json',
+        ANN_FN3:
+            _DATA_DIR + '/openimages_v4/rel/att_5_attributes.json',
+    },
+    # GQA dataset
+    'gqa_train': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/detections_train.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/att_annotations_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes.json',
+    },
+    'gqa_val': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/detections_val.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/att_annotations_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes.json',
+    },
+    'gqa_all': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/dummy_detections_all.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/dummy_att_annotations_all.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes.json',
+    },
+#     'gqa_1st_of_3': {
+#         IM_DIR:
+#             _DATA_DIR + '/gqa/images',
+#         ANN_FN:
+#             _DATA_DIR + '/gqa/dummy_detections_all.json',
+#         ANN_FN2:
+#             _DATA_DIR + '/gqa/dummy_att_annotations_all_1st_of_3.json',
+#         ANN_FN3:
+#             _DATA_DIR + '/gqa/attributes.json',
+#     },
+#     'gqa_2nd_of_3': {
+#         IM_DIR:
+#             _DATA_DIR + '/gqa/images',
+#         ANN_FN:
+#             _DATA_DIR + '/gqa/dummy_detections_all.json',
+#         ANN_FN2:
+#             _DATA_DIR + '/gqa/dummy_att_annotations_all_2nd_of_3.json',
+#         ANN_FN3:
+#             _DATA_DIR + '/gqa/attributes.json',
+#     },
+#     'gqa_3rd_of_3': {
+#         IM_DIR:
+#             _DATA_DIR + '/gqa/images',
+#         ANN_FN:
+#             _DATA_DIR + '/gqa/dummy_detections_all.json',
+#         ANN_FN2:
+#             _DATA_DIR + '/gqa/dummy_att_annotations_all_3rd_of_3.json',
+#         ANN_FN3:
+#             _DATA_DIR + '/gqa/attributes.json',
+#     },
+    # GQA dataset no_plural_adj_only
+    'gqa_no_plural_adj_only_train': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/detections_train_no_plural.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/att_annotations_adj_only_no_plural_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes_adj_only.json',
+    },
+    'gqa_no_plural_adj_only_val': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/detections_val_no_plural.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/att_annotations_adj_only_no_plural_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes_adj_only.json',
+    },
+    'gqa_no_plural_adj_only_all': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/dummy_detections_no_plural_all.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/dummy_att_annotations_all.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes_adj_only.json',
+    },
+    # GQA dataset no_plural_no_adj
+    'gqa_no_plural_no_adj_train': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/detections_train_no_plural.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/att_annotations_no_adj_no_plural_train.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes_no_adj.json',
+    },
+    'gqa_no_plural_no_adj_val': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/detections_val_no_plural.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/att_annotations_no_adj_no_plural_val.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes_no_adj.json',
+    },
+    'gqa_no_plural_no_adj_all': {
+        IM_DIR:
+            _DATA_DIR + '/gqa/images',
+        ANN_FN:
+            _DATA_DIR + '/gqa/dummy_detections_no_plural_all.json',
+        ANN_FN2:
+            _DATA_DIR + '/gqa/dummy_att_annotations_all.json',
+        ANN_FN3:
+            _DATA_DIR + '/gqa/attributes_no_adj.json',
+    },
+}

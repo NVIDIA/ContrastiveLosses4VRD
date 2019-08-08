@@ -30,17 +30,33 @@ def get_rel_counts(ds_name, must_overlap=True):
     :return: 
     """
 
-    if ds_name.find('vg') >= 0:
-        with open(DATASETS['vg_train'][ANN_FN2]) as f:
-            train_data = json.load(f)
-    elif ds_name.find('oi') >= 0:
-        with open(DATASETS['oi_rel_train'][ANN_FN2]) as f:
-            train_data = json.load(f)
-    elif ds_name.find('vrd') >= 0:
-        with open(DATASETS['vrd_train'][ANN_FN2]) as f:
+#     if ds_name.find('vg') >= 0:
+#         with open(DATASETS['vg_train'][ANN_FN2]) as f:
+#             train_data = json.load(f)
+#     elif ds_name.find('oi') >= 0:
+#         with open(DATASETS['oi_rel_train'][ANN_FN2]) as f:
+#             train_data = json.load(f)
+#     elif ds_name.find('vrd') >= 0:
+#         with open(DATASETS['vrd_train'][ANN_FN2]) as f:
+#             train_data = json.load(f)
+#     elif ds_name.find('gqa') >= 0:
+#         with open(DATASETS['gqa_train'][ANN_FN2]) as f:
+#             train_data = json.load(f)
+#     else:
+#         raise NotImplementedError
+
+    if len(cfg.TRAIN.DATASETS) > 0:
+        with open(DATASETS[cfg.TRAIN.DATASETS[0]][ANN_FN2]) as f:
             train_data = json.load(f)
     else:
-        raise NotImplementedError
+        ds_keywords = cfg.TEST.DATASETS[0].split('_')
+        if ds_keywords[-1] == 'val' or ds_keywords[-1] == 'test' or ds_keywords[-1] == 'all':
+            ds_keywords = ds_keywords[:-1]
+        elif ds_keywords[-2] == 'of':  # those "x_of_3" test json files
+            ds_keywords = ds_keywords[:-3]
+        ds_name = '_'.join(ds_keywords + ['train'])
+        with open(DATASETS[ds_name][ANN_FN2]) as f:
+            train_data = json.load(f)
 
     fg_matrix = np.zeros((
         cfg.MODEL.NUM_CLASSES - 1,  # not include background

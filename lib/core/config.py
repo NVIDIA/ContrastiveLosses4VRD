@@ -67,10 +67,12 @@ __C.TRAIN.IMS_PER_BATCH = 2
 __C.TRAIN.BATCH_SIZE_PER_IM = 64
 
 __C.TRAIN.FG_REL_SIZE_PER_IM = 512
+__C.TRAIN.FG_ATT_SIZE_PER_IM = 512
 
 # Fraction of minibatch that is labeled foreground (i.e. class > 0)
 __C.TRAIN.FG_FRACTION = 0.25
 __C.TRAIN.FG_REL_FRACTION = 0.25
+__C.TRAIN.FG_ATT_FRACTION = 0.25
 
 # Overlap threshold for a ROI to be considered foreground (if >= FG_THRESH)
 __C.TRAIN.FG_THRESH = 0.5
@@ -471,6 +473,7 @@ __C.MODEL.USE_SPO_AGNOSTIC_COMPENSATION = False
 # E.g., 81 for COCO (80 foreground + 1 background)
 __C.MODEL.NUM_CLASSES = -1
 __C.MODEL.NUM_PRD_CLASSES = -1
+__C.MODEL.NUM_ATT_CLASSES = -1
 
 # Use a class agnostic bounding box regressor instead of the default per-class
 # regressor
@@ -681,6 +684,14 @@ __C.SOLVER.SCALE_MOMENTUM_THRESHOLD = 1.1
 # Suppress logging of changes to LR unless the relative change exceeds this
 # threshold (prevents linear warm up from spamming the training log)
 __C.SOLVER.LOG_LR_CHANGE_THRESHOLD = 1.1
+
+# By Ji on 05/10/2019:
+# added cosine annealing from funnyzhou/FPN-Pytorch
+# Cosine Annealing
+__C.SOLVER.COSINE_LR = False
+__C.SOLVER.COSINE_NUM_EPOCH = 13
+__C.SOLVER.COSINE_T0 = 3
+__C.SOLVER.COSINE_MULTI = 2
 
 
 # ---------------------------------------------------------------------------- #
@@ -978,12 +989,19 @@ __C.RESNETS.COCO_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.OI_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.OI_REL_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.OI_REL_PRD_PRETRAINED_WEIGHTS = ''
+__C.RESNETS.OI_ATT_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.VRD_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.VRD_PRD_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.VG_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.VG_PRD_PRETRAINED_WEIGHTS = ''
 __C.RESNETS.TO_BE_FINETUNED_WEIGHTS = ''
 __C.RESNETS.REL_PRETRAINED_WEIGHTS = ''
+
+# By Ji on 05/11/2019
+__C.RESNETS.ATT_RCNN_PRETRAINED_WEIGHTS = ''
+
+# By Ji on 05/11/2019
+__C.RESNETS.REL_RCNN_PRETRAINED_WEIGHTS = ''
 
 # Use GroupNorm instead of BatchNorm
 __C.RESNETS.USE_GN = False
@@ -1132,7 +1150,9 @@ def assert_and_infer_cfg(make_immutable=True):
 def merge_cfg_from_file(cfg_filename):
     """Load a yaml config file and merge it into the global config."""
     with open(cfg_filename, 'r') as f:
-        yaml_cfg = AttrDict(yaml.load(f))        
+        yaml_load = lambda x: yaml.load(x, Loader=yaml.Loader)
+        yaml_cfg = AttrDict(yaml_load(f))
+#         yaml_cfg = AttrDict(yaml.load(f))        
     _merge_a_into_b(yaml_cfg, __C)
 
 

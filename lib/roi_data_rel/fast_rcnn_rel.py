@@ -73,7 +73,7 @@ def _sample_pairs(roidb, im_scale, batch_idx):
     
     fg_pairs_per_this_image = np.minimum(fg_pairs_per_image, gt_pair_inds.size + fg_pair_inds.size)
     # Sample foreground regions without replacement
-    if fg_pair_inds.size > 0:
+    if fg_pair_inds.size > 0 and fg_pairs_per_this_image > gt_pair_inds.size:
         fg_pair_inds = npr.choice(
             fg_pair_inds, size=(fg_pairs_per_this_image - gt_pair_inds.size), replace=False)
     fg_pair_inds = np.append(fg_pair_inds, gt_pair_inds)
@@ -93,6 +93,7 @@ def _sample_pairs(roidb, im_scale, batch_idx):
         if bg_pair_inds.size > 0:
             bg_pair_inds = npr.choice(
                 bg_pair_inds, size=bg_pairs_per_this_image, replace=False)
+#         logger.info('{} : {}'.format(fg_pair_inds.size, bg_pair_inds.size))  
         keep_pair_inds = np.append(fg_pair_inds, bg_pair_inds)
         all_prd_labels = np.zeros(keep_pair_inds.size, dtype=np.int32)
         all_prd_labels[:fg_pair_inds.size] = fg_prd_labels + 1  # class should start from 1

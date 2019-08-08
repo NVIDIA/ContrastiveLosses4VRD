@@ -143,14 +143,14 @@ def eval_rel_results(all_results, output_dir, do_val=True, do_vis=False, do_spec
                               det_labels_p_top=det_labels_p_top,
                               det_labels_o_top=det_labels_o_top,
                               det_scores_top=det_scores_top))
-        topk_dets[-1]['det_scores_top_vis'] = det_scores_top_vis
-        if 'prd_scores_bias' in res:
-            topk_dets[-1]['det_scores_top_bias'] = det_scores_top_bias
-        if 'prd_scores_spt' in res:
-            topk_dets[-1]['det_scores_top_spt'] = det_scores_top_spt
-        if do_vis:
-            topk_dets[-1].update(dict(blob_conv=res['blob_conv'],
-                                      blob_conv_prd=res['blob_conv_prd']))
+#         topk_dets[-1]['det_scores_top_vis'] = det_scores_top_vis
+#         if 'prd_scores_bias' in res:
+#             topk_dets[-1]['det_scores_top_bias'] = det_scores_top_bias
+#         if 'prd_scores_spt' in res:
+#             topk_dets[-1]['det_scores_top_spt'] = det_scores_top_spt
+#         if do_vis:
+#             topk_dets[-1].update(dict(blob_conv=res['blob_conv'],
+#                                       blob_conv_prd=res['blob_conv_prd']))
 
         if do_val:
             gt_boxes_sbj = res['gt_sbj_boxes']  # (#num_gt, 4)
@@ -245,11 +245,11 @@ def eval_rel_results(all_results, output_dir, do_val=True, do_vis=False, do_spec
             # print('Excel-friendly format:')
             # print(excel_str.strip()[:-1])
     
-#     print('Saving topk dets...')
-#     topk_dets_f = os.path.join(output_dir, 'rel_detections_topk.pkl')
-#     with open(topk_dets_f, 'wb') as f:
-#         pickle.dump(topk_dets, f, pickle.HIGHEST_PROTOCOL)
-#     logger.info('topk_dets size: {}'.format(len(topk_dets)))
+    print('Saving topk dets...')
+    topk_dets_f = os.path.join(output_dir, 'rel_detections_topk_{}.pkl'.format(topk))
+    with open(topk_dets_f, 'wb') as f:
+        pickle.dump(topk_dets, f, pickle.HIGHEST_PROTOCOL)
+    logger.info('topk_dets size: {}'.format(len(topk_dets)))
     print('Done.')
 
 

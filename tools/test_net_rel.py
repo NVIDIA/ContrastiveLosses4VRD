@@ -127,6 +127,120 @@ if __name__ == '__main__':
         cfg.TEST.DATASETS = ('vrd_val',)
         cfg.MODEL.NUM_CLASSES = 101
         cfg.MODEL.NUM_PRD_CLASSES = 70  # exclude background
+    elif args.dataset == "gqa":
+        cfg.TEST.DATASETS = ('gqa_val',)
+        cfg.MODEL.NUM_CLASSES = 1704
+        cfg.MODEL.NUM_PRD_CLASSES = 310  # rel, exclude background
+
+    elif args.dataset == "gqa_all":
+        cfg.TEST.DATASETS = ('gqa_all',)
+        cfg.MODEL.NUM_CLASSES = 1704
+        cfg.MODEL.NUM_PRD_CLASSES = 310  # rel, exclude background
+    elif args.dataset == "gqa_1st_of_3":
+        cfg.TEST.DATASETS = ('gqa_1st_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1704
+        cfg.MODEL.NUM_PRD_CLASSES = 310  # rel, exclude background
+    elif args.dataset == "gqa_2nd_of_3":
+        cfg.TEST.DATASETS = ('gqa_2nd_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1704
+        cfg.MODEL.NUM_PRD_CLASSES = 310  # rel, exclude background
+    elif args.dataset == "gqa_3rd_of_3":
+        cfg.TEST.DATASETS = ('gqa_3rd_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1704
+        cfg.MODEL.NUM_PRD_CLASSES = 310  # rel, exclude background
+
+    elif args.dataset == "gqa_spt":
+        cfg.TEST.DATASETS = ('gqa_spt_val',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 23  # rel, exclude background
+    elif args.dataset == "gqa_verb":
+        cfg.TEST.DATASETS = ('gqa_verb_val',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_misc":
+        cfg.TEST.DATASETS = ('gqa_misc_val',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 70  # rel, exclude background
+
+    # rel_spt
+    elif args.dataset == "gqa_spt_1st_of_3":
+        cfg.TEST.DATASETS = ('gqa_spt_1st_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 23  # rel, exclude background
+    elif args.dataset == "gqa_spt_2nd_of_3":
+        cfg.TEST.DATASETS = ('gqa_spt_2nd_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 23  # rel, exclude background
+    elif args.dataset == "gqa_spt_3rd_of_3":
+        cfg.TEST.DATASETS = ('gqa_spt_3rd_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 23  # rel, exclude background
+    # rel_verb
+    elif args.dataset == "gqa_verb_all":
+        cfg.TEST.DATASETS = ('gqa_verb_all',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_1st_of_3":
+        cfg.TEST.DATASETS = ('gqa_verb_1st_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_2nd_of_3":
+        cfg.TEST.DATASETS = ('gqa_verb_2nd_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_3rd_of_3":
+        cfg.TEST.DATASETS = ('gqa_verb_3rd_of_3',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_1st_of_6":
+        cfg.TEST.DATASETS = ('gqa_verb_1st_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_2nd_of_6":
+        cfg.TEST.DATASETS = ('gqa_verb_2nd_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_3rd_of_6":
+        cfg.TEST.DATASETS = ('gqa_verb_3rd_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_4th_of_6":
+        cfg.TEST.DATASETS = ('gqa_verb_4th_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_5th_of_6":
+        cfg.TEST.DATASETS = ('gqa_verb_5th_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    elif args.dataset == "gqa_verb_6th_of_6":
+        cfg.TEST.DATASETS = ('gqa_verb_6th_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
+    # rel_misc
+    elif args.dataset == "gqa_misc_1st_of_6":
+        cfg.TEST.DATASETS = ('gqa_misc_1st_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 70  # rel, exclude background
+    elif args.dataset == "gqa_misc_2nd_of_6":
+        cfg.TEST.DATASETS = ('gqa_misc_2nd_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 70  # rel, exclude background
+    elif args.dataset == "gqa_misc_3rd_of_6":
+        cfg.TEST.DATASETS = ('gqa_misc_3rd_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 70  # rel, exclude background
+    elif args.dataset == "gqa_misc_4th_of_6":
+        cfg.TEST.DATASETS = ('gqa_misc_4th_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 70  # rel, exclude background
+    elif args.dataset == "gqa_misc_5th_of_6":
+        cfg.TEST.DATASETS = ('gqa_misc_5th_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 70  # rel, exclude background
+    elif args.dataset == "gqa_misc_6th_of_6":
+        cfg.TEST.DATASETS = ('gqa_misc_6th_of_6',)
+        cfg.MODEL.NUM_CLASSES = 1321
+        cfg.MODEL.NUM_PRD_CLASSES = 70  # rel, exclude background
     else:  # For subprocess call
         assert cfg.TEST.DATASETS, 'cfg.TEST.DATASETS shouldn\'t be empty'
 

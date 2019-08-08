@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+.ipynb_checkpoints/
+
+# Shared objects
+*.so
+
+# Temporary files
+*.swn
+*.swo
+*.swp
+
+# Generated C files
+lib/utils/*.
+
+data
+detection_models
+Outputs
+trained_models

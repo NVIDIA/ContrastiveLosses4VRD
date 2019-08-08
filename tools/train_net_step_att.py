@@ -1,6 +1,6 @@
 # Adapted by Ji Zhang, 2019
 #
-# Based on Detectron.pytorch/tools/train_net.py Written by Roy Tseng
+# Based on train_net.py Written by Roy Tseng
 
 """ Training script for steps_with_decay policy"""
 
@@ -27,13 +27,13 @@ import nn as mynn
 import utils_rel.net_rel as net_utils_rel
 import utils.misc as misc_utils
 from core.config import cfg, cfg_from_file, cfg_from_list, assert_and_infer_cfg
-from datasets_rel.roidb_rel import combined_roidb_for_training
-from roi_data_rel.loader_rel import RoiDataLoader, MinibatchSampler, BatchSampler, collate_minibatch
-from modeling_rel.model_builder_rel import Generalized_RCNN
+from datasets_rel.roidb_att import combined_roidb_for_training
+from roi_data_rel.loader_att import RoiDataLoader, MinibatchSampler, BatchSampler, collate_minibatch
+from modeling_rel.model_builder_att import Generalized_RCNN
 from utils.detectron_weight_helper import load_detectron_weight
 from utils.logging import setup_logging
 from utils.timer import Timer
-from utils_rel.training_stats_rel import TrainingStats
+from utils_rel.training_stats_att import TrainingStats
 
 # Set up logging and load config options
 logger = setup_logging(__name__)
@@ -155,42 +155,28 @@ def main():
     else:
         raise ValueError("Need Cuda device to run !")
 
-    if args.dataset == "vrd":
-        cfg.TRAIN.DATASETS = ('vrd_train',)
-        cfg.MODEL.NUM_CLASSES = 101
-        cfg.MODEL.NUM_PRD_CLASSES = 70  # exclude background
-    elif args.dataset == "vg_mini":
-        cfg.TRAIN.DATASETS = ('vg_train_mini',)
-        cfg.MODEL.NUM_CLASSES = 151
-        cfg.MODEL.NUM_PRD_CLASSES = 50  # exclude background
-    elif args.dataset == "vg":
-        cfg.TRAIN.DATASETS = ('vg_train',)
-        cfg.MODEL.NUM_CLASSES = 151
-        cfg.MODEL.NUM_PRD_CLASSES = 50  # exclude background
-    elif args.dataset == "oi_rel":
-        cfg.TRAIN.DATASETS = ('oi_rel_train',)
+    if args.dataset == "oi_att":
+        cfg.TRAIN.DATASETS = ('oi_att_train',)
+        # cfg.MODEL.NUM_CLASSES = 62
         cfg.MODEL.NUM_CLASSES = 58
-        cfg.MODEL.NUM_PRD_CLASSES = 9  # rel, exclude background
-    elif args.dataset == "oi_rel_mini":
-        cfg.TRAIN.DATASETS = ('oi_rel_train_mini',)
+        cfg.MODEL.NUM_ATT_CLASSES = 5  # att, exclude background
+    elif args.dataset == "oi_att_mini":
+        cfg.TRAIN.DATASETS = ('oi_att_train_mini',)
+        # cfg.MODEL.NUM_CLASSES = 62
         cfg.MODEL.NUM_CLASSES = 58
-        cfg.MODEL.NUM_PRD_CLASSES = 9  # rel, exclude background
+        cfg.MODEL.NUM_ATT_CLASSES = 5  # att, exclude background
     elif args.dataset == "gqa":
         cfg.TRAIN.DATASETS = ('gqa_train',)
         cfg.MODEL.NUM_CLASSES = 1704
-        cfg.MODEL.NUM_PRD_CLASSES = 310  # rel, exclude background
-    elif args.dataset == "gqa_verb":
-        cfg.TRAIN.DATASETS = ('gqa_verb_train',)
+        cfg.MODEL.NUM_ATT_CLASSES = 617  # att, exclude background
+    elif args.dataset == "gqa_no_plural_adj_only":
+        cfg.TRAIN.DATASETS = ('gqa_no_plural_adj_only_train',)
         cfg.MODEL.NUM_CLASSES = 1321
-        cfg.MODEL.NUM_PRD_CLASSES = 216  # rel, exclude background
-    elif args.dataset == "gqa_spt":
-        cfg.TRAIN.DATASETS = ('gqa_spt_train',)
+        cfg.MODEL.NUM_ATT_CLASSES = 445  # att, exclude background
+    elif args.dataset == "gqa_no_plural_no_adj":
+        cfg.TRAIN.DATASETS = ('gqa_no_plural_no_adj_train',)
         cfg.MODEL.NUM_CLASSES = 1321
-        cfg.MODEL.NUM_PRD_CLASSES = 23  # rel, exclude background
-    elif args.dataset == "gqa_misc":
-        cfg.TRAIN.DATASETS = ('gqa_misc_train',)
-        cfg.MODEL.NUM_CLASSES = 1321
-        cfg.MODEL.NUM_PRD_CLASSES = 70  # rel, exclude background
+        cfg.MODEL.NUM_ATT_CLASSES = 172  # att, exclude background
     else:
         raise ValueError("Unexpected args.dataset: {}".format(args.dataset))
 
@@ -199,12 +185,12 @@ def main():
         cfg_from_list(args.set_cfgs)
 
     ### Adaptively adjust some configs ###
-    cfg.NUM_GPUS = torch.cuda.device_count()
     original_batch_size = cfg.NUM_GPUS * cfg.TRAIN.IMS_PER_BATCH
     original_ims_per_batch = cfg.TRAIN.IMS_PER_BATCH
     original_num_gpus = cfg.NUM_GPUS
     if args.batch_size is None:
         args.batch_size = original_batch_size
+    cfg.NUM_GPUS = torch.cuda.device_count()
     assert (args.batch_size % cfg.NUM_GPUS) == 0, \
         'batch_size: %d, NUM_GPUS: %d' % (args.batch_size, cfg.NUM_GPUS)
     cfg.TRAIN.IMS_PER_BATCH = args.batch_size // cfg.NUM_GPUS
@@ -298,12 +284,12 @@ def main():
     gn_params = []
     backbone_bias_params = []
     backbone_bias_param_names = []
-    prd_branch_bias_params = []
-    prd_branch_bias_param_names = []
+    att_branch_bias_params = []
+    att_branch_bias_param_names = []
     backbone_nonbias_params = []
     backbone_nonbias_param_names = []
-    prd_branch_nonbias_params = []
-    prd_branch_nonbias_param_names = []
+    att_branch_nonbias_params = []
+    att_branch_nonbias_param_names = []
     for key, value in dict(maskRCNN.named_parameters()).items():
         if value.requires_grad:
             if 'gn' in key:
@@ -317,11 +303,11 @@ def main():
                     backbone_nonbias_param_names.append(key)
             else:
                 if 'bias' in key:
-                    prd_branch_bias_params.append(value)
-                    prd_branch_bias_param_names.append(key)
+                    att_branch_bias_params.append(value)
+                    att_branch_bias_param_names.append(key)
                 else:
-                    prd_branch_nonbias_params.append(value)
-                    prd_branch_nonbias_param_names.append(key)
+                    att_branch_nonbias_params.append(value)
+                    att_branch_nonbias_param_names.append(key)
     # Learning rate of 0 is a dummy value to be set properly at the start of training
     params = [
         {'params': backbone_nonbias_params,
@@ -330,10 +316,10 @@ def main():
         {'params': backbone_bias_params,
          'lr': 0 * (cfg.SOLVER.BIAS_DOUBLE_LR + 1),
          'weight_decay': cfg.SOLVER.WEIGHT_DECAY if cfg.SOLVER.BIAS_WEIGHT_DECAY else 0},
-        {'params': prd_branch_nonbias_params,
+        {'params': att_branch_nonbias_params,
          'lr': 0,
          'weight_decay': cfg.SOLVER.WEIGHT_DECAY},
-        {'params': prd_branch_bias_params,
+        {'params': att_branch_bias_params,
          'lr': 0 * (cfg.SOLVER.BIAS_DOUBLE_LR + 1),
          'weight_decay': cfg.SOLVER.WEIGHT_DECAY if cfg.SOLVER.BIAS_WEIGHT_DECAY else 0},
         {'params': gn_params,
@@ -381,7 +367,7 @@ def main():
                                  minibatch=True)
 
     ### Training Setups ###
-    args.run_name = misc_utils.get_run_name() + '_step_with_prd_cls_v' + str(cfg.MODEL.SUBTYPE)
+    args.run_name = misc_utils.get_run_name() + '_step_with_att_cls_v' + str(cfg.MODEL.SUBTYPE)
     output_dir = misc_utils.get_output_dir(args, args.run_name)
     args.cfg_filename = os.path.basename(args.cfg_file)
 
@@ -433,13 +419,13 @@ def main():
                 else:
                     raise KeyError('Unknown SOLVER.WARM_UP_METHOD: {}'.format(method))
                 lr_new = cfg.SOLVER.BASE_LR * warmup_factor
-                net_utils_rel.update_learning_rate_rel(optimizer, lr, lr_new)
+                net_utils_rel.update_learning_rate_att(optimizer, lr, lr_new)
                 # lr = optimizer.param_groups[0]['lr']
                 lr = optimizer.param_groups[2]['lr']
                 backbone_lr = optimizer.param_groups[0]['lr']
                 assert lr == lr_new
             elif step == cfg.SOLVER.WARM_UP_ITERS:
-                net_utils_rel.update_learning_rate_rel(optimizer, lr, cfg.SOLVER.BASE_LR)
+                net_utils_rel.update_learning_rate_att(optimizer, lr, cfg.SOLVER.BASE_LR)
                 # lr = optimizer.param_groups[0]['lr']
                 lr = optimizer.param_groups[2]['lr']
                 backbone_lr = optimizer.param_groups[0]['lr']
@@ -461,7 +447,7 @@ def main():
                 n_max = cfg.SOLVER.BASE_LR
                 n_min = n_max * cfg.SOLVER.GAMMA
                 lr_new = n_min + 0.5 * (n_max - n_min) * (1 + math.cos(step * math.pi / iters_T))
-                net_utils_rel.update_learning_rate_rel(optimizer, lr, lr_new)
+                net_utils_rel.update_learning_rate_att(optimizer, lr, lr_new)
 #                 lr = optimizer.param_groups[0]['lr']
                 lr = optimizer.param_groups[2]['lr']
                 assert lr == lr_new
@@ -470,7 +456,7 @@ def main():
                     step == cfg.SOLVER.STEPS[decay_steps_ind]:
                 logger.info('Decay the learning on step %d', step)
                 lr_new = lr * cfg.SOLVER.GAMMA
-                net_utils_rel.update_learning_rate_rel(optimizer, lr, lr_new)
+                net_utils_rel.update_learning_rate_att(optimizer, lr, lr_new)
                 # lr = optimizer.param_groups[0]['lr']
                 lr = optimizer.param_groups[2]['lr']
                 backbone_lr = optimizer.param_groups[0]['lr']

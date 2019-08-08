@@ -74,12 +74,13 @@ class single_scale_relpn_outputs(nn.Module):
                 sbj_boxes.astype(dtype=np.float32, copy=False),
                 obj_boxes.astype(dtype=np.float32, copy=False))
             ovlp_inds = np.where(ovlp_so > 0)[0]
-            sbj_inds = sbj_inds[ovlp_inds]
-            obj_inds = obj_inds[ovlp_inds]
-            sbj_rois = sbj_rois[ovlp_inds]
-            obj_rois = obj_rois[ovlp_inds]
-            sbj_boxes = sbj_boxes[ovlp_inds]
-            obj_boxes = obj_boxes[ovlp_inds]
+            if ovlp_inds.size > 0:  # only valid when this filtering leaves at least one sample
+                sbj_inds = sbj_inds[ovlp_inds]
+                obj_inds = obj_inds[ovlp_inds]
+                sbj_rois = sbj_rois[ovlp_inds]
+                obj_rois = obj_rois[ovlp_inds]
+                sbj_boxes = sbj_boxes[ovlp_inds]
+                obj_boxes = obj_boxes[ovlp_inds]
             
         return_dict = {}
         if self.training:
