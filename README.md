@@ -17,7 +17,7 @@ git clone https://github.com/NVIDIA/ContrastiveLosses4VRD.git --recurse-submodul
 ## Requirements
 * Python 3
 * Python packages
-  * pytorch 0.4.0 or 0.4.1.post2 (not guaranteed to work on newer versions)
+  * pytorch==1.0 (not guaranteed to work on v1.1)
   * cython
   * matplotlib
   * numpy
