@@ -61,6 +61,8 @@ def parse_args():
         '--multi-gpu-testing', help='using multiple gpus for inference',
         action='store_true')
     parser.add_argument(
+        '--topk', dest='topk', help='do evaluation', type=int, default=100)
+    parser.add_argument(
         '--do_val', dest='do_val', help='do evaluation', action='store_true')
     parser.add_argument(
         '--do_vis', dest='do_vis', help='visualize the last layer of conv_body', action='store_true')
@@ -278,9 +280,9 @@ if __name__ == '__main__':
             all_results = pickle.load(f)
         logger.info('Starting evaluation now...')
         if args.dataset.find('vg') >= 0 or args.dataset.find('vrd') >= 0:
-            task_evaluation_vg_and_vrd.eval_rel_results(all_results, args.output_dir, args.do_val)
+            task_evaluation_vg_and_vrd.eval_rel_results(all_results, args.output_dir, args.topk, args.do_val)
         else:
-            task_evaluation_sg.eval_rel_results(all_results, args.output_dir, args.do_val, args.do_vis, args.do_special)
+            task_evaluation_sg.eval_rel_results(all_results, args.output_dir, args.topk, args.do_val, args.do_vis, args.do_special)
     else:
         run_inference(
             args,

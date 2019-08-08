@@ -24,9 +24,9 @@ np.set_printoptions(precision=3)
 logger = logging.getLogger(__name__)
 
 
-def eval_rel_results(all_results, output_dir, do_val=True, do_vis=False, do_special=False):
-    
-    topk = 100
+def eval_rel_results(all_results, output_dir, topk=100, do_val=True, do_vis=False, do_special=False):
+
+    print('topk: ', topk)
 
     if cfg.TEST.DATASETS[0].find('vg') >= 0:
         eval_per_img = True
@@ -42,9 +42,9 @@ def eval_rel_results(all_results, output_dir, do_val=True, do_vis=False, do_spec
         eval_ap = False
     
     if eval_per_img:
-        recalls = {1: [], 5: [], 10: [], 20: [], 50: [], 100: []}
+        recalls = {1: [], 5: [], 10: [], 20: [], 50: [], 100: [], 200: [], 400: []}
     else:
-        recalls = {1: 0, 5: 0, 10: 0, 20: 0, 50: 0, 100: 0}
+        recalls = {1: 0, 5: 0, 10: 0, 20: 0, 50: 0, 100: 0, 200: 0, 400: 0}
         if do_val:
             all_gt_cnt = 0
 
