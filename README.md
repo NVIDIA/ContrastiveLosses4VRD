@@ -11,6 +11,12 @@ This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Gra
 ## News
 We have created a branch for a version supporting pytorch1.0! Just go to the [pytorch1_0](https://github.com/NVIDIA/ContrastiveLosses4VRD/tree/pytorch1_0) branch and check it out!
 
+## Benchmarking
+| Syntax      | Description | Test Text     |
+| :---        |    :----:   |          ---: |
+| Header      | Title       | Here's this   |
+| Paragraph   | Text        | And more      |
+
 ## Cloning
 ```
 git clone https://github.com/NVIDIA/ContrastiveLosses4VRD.git --recurse-submodules
