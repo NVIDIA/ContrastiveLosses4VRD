@@ -23,9 +23,13 @@ We have created a branch for a version supporting pytorch1.0! Just go to the [py
 | RelDN, full                    |  ResNext-101-FPN  | 22.5     | 31.0     | 36.7      |
 
 \*"RelDN" is the relationship detection model we proposed in the paper.
+
 \*We use the frequency prior in our model by default.
+
 \*Results of "Graph-RCNN" are directly copied from [their repo](https://github.com/jwyang/graph-rcnn.pytorch).
+
 \[1\] [Zellers, Rowan, et al. "Neural motifs: Scene graph parsing with global context." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2018.](http://openaccess.thecvf.com/content_cvpr_2018/html/Zellers_Neural_Motifs_Scene_CVPR_2018_paper.html)
+
 \[2\] [Yang, Jianwei, et al. "Graph r-cnn for scene graph generation." Proceedings of the European Conference on Computer Vision (ECCV). 2018.](http://openaccess.thecvf.com/content_ECCV_2018/html/Jianwei_Yang_Graph_R-CNN_for_ECCV_2018_paper.html)
 
 ## Cloning
