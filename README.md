@@ -12,15 +12,9 @@ This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Gra
 We have created a branch for a version supporting pytorch1.0! Just go to the [pytorch1_0](https://github.com/NVIDIA/ContrastiveLosses4VRD/tree/pytorch1_0) branch and check it out!
 
 ## Benchmarking
-| Method | SGDET@20 | SGDET@50 | SGDET@100 | SGCLS@20 | SGCLS@50 | SGCLS@100 | PRDCLS@20 | PRDCLS@50 | PRDCLS@100 |
-| :- | :-: | :-: | :-: | :-: | :-: | :-: |
-| Associative Embedding | 6.5 | 8.1 | 8.2 | 
-| Message Passing | 123 | 456 |
-| Frequency | 123 | 456 |
-| Frequency+Overlap | 123 | 456 |
-| MotifNet | 123 | 456 |
-| this repo, VGG16 | 123 | 456 |
-| this repo, ResNext-101-FPN | 123 | 456 |
+| Method                                 | SGDET@20 | SGDET@50 | SGDET@100 | SGCLS@20 | SGCLS@50 | SGCLS@100 | PRDCLS@20 | PRDCLS@50 | PRDCLS@100 |
+| :---                                   |  :----:  |  :----:  |  :----:   |  :----:  |  :----:  |  :----:   |  :----:   |   :----:    |   :----:   |
+| Associative Embedding                  |   6.5    |   8.1    |    8.2    |   18.2   |   21.8   |   22.6    |   47.9    |     54.1      |    55.4    |
 
 ## Cloning
 ```
