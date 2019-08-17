@@ -147,7 +147,7 @@ python tools/convert_vrd_anno_to_coco_format.py
 Download pre-trained object detection models [here](https://drive.google.com/open?id=1NrqOLbMa_RwHbG3KIXJFWLnlND2kiIpj). Unzip it under the root directory. **Note:** We do not include code for training object detectors. Please refer to the "(Optional) Training Object Detection Models" section in [Large-Scale-VRD.pytorch](https://github.com/jz462/Large-Scale-VRD.pytorch) for this.
 
 ## Our Trained Relationship Detection Models
-Download our trained models [here](https://drive.google.com/open?id=1mVnkZXdlg1ClVF5cGrSgQm31Q3Z0ZcNX). Unzip it under the root folder and you should see a `trained_models` folder there.
+Download our trained models [here](https://drive.google.com/open?id=15w0q3Nuye2ieu_aUNdTS_FNvoVzM4RMF). Unzip it under the root folder and you should see a `trained_models` folder there.
 
 ## Directory Structure
 The final directories for data and detection models should look like:
