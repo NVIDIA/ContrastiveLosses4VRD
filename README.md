@@ -11,7 +11,7 @@ This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Gra
 ## News
 We have created a branch for a version supporting pytorch1.0! Just go to the [pytorch1_0](https://github.com/NVIDIA/ContrastiveLosses4VRD/tree/pytorch1_0) branch and check it out!
 
-## Benchmarking
+## Benchmarking on Visual Genome
 | Method                         |  Backbone         | SGDET@20 | SGDET@50 | SGDET@100 |
 | :---                           |       :----:      |  :----:  |  :----:  |  :----:   |
 | Frequency \[1\]                |  VGG16            | 17.7     | 23.5     | 27.6      |
