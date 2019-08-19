@@ -8,6 +8,27 @@ Example results of RelDN with without and with our losses. "L0 only" means using
 
 This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Graph Parsing, CVPR2019](https://arxiv.org/abs/1903.02728). This is an improved version of the code that won the 1st place in the [Google AI Open Images Visual Relationship Detection Chanllenge](https://www.kaggle.com/c/google-ai-open-images-visual-relationship-track/leaderboard).
 
+## Benchmarking on Visual Genome
+| Method                         |  Backbone         | SGDET@20 | SGDET@50 | SGDET@100 |
+| :---                           |       :----:      |  :----:  |  :----:  |  :----:   |
+| Frequency \[1\]                |  VGG16            | 17.7     | 23.5     | 27.6      |
+| Frequency+Overlap \[1\]        |  VGG16            | 20.1     | 26.2     | 30.1      |
+| MotifNet \[1\]                 |  VGG16            | 21.4     | 27.2     | 30.3      |
+| Graph-RCNN \[2\]               |  Res-101          | 19.4	    | 25.0     |	28.5      |
+| RelDN, w/o contrastive losses  |  VGG16            | 20.8     | 28.1     | 32.5      |
+| RelDN, full                    |  VGG16            | 21.1     | 28.3     | 32.7      |
+| RelDN, full                    |  ResNext-101-FPN  | 22.5     | 31.0     | 36.7      |
+
+\*"RelDN" is the relationship detection model we proposed in the paper.
+
+\*We use the frequency prior in our model by default.
+
+\*Results of "Graph-RCNN" are directly copied from [their repo](https://github.com/jwyang/graph-rcnn.pytorch).
+
+\[1\] [Zellers, Rowan, et al. "Neural motifs: Scene graph parsing with global context." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2018.](http://openaccess.thecvf.com/content_cvpr_2018/html/Zellers_Neural_Motifs_Scene_CVPR_2018_paper.html)
+
+\[2\] [Yang, Jianwei, et al. "Graph r-cnn for scene graph generation." Proceedings of the European Conference on Computer Vision (ECCV). 2018.](http://openaccess.thecvf.com/content_ECCV_2018/html/Jianwei_Yang_Graph_R-CNN_for_ECCV_2018_paper.html)
+
 ## Cloning
 ```
 git clone https://github.com/NVIDIA/ContrastiveLosses4VRD.git --recurse-submodules
