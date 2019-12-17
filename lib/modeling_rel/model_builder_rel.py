@@ -501,7 +501,7 @@ class Generalized_RCNN(nn.Module):
                 else:
                     sbj_labels_sbj_pos_fg = None
                     obj_labels_sbj_pos_fg = None
-                _, prd_bias_scores_sbj_pos, _, ttl_cls_scores_sbj_pos, _, _, prd_cls_feats = \
+                _, prd_bias_scores_sbj_pos, _, ttl_cls_scores_sbj_pos, _, _ = \
                     self.RelDN(spo_feat_sbj_pos, spt_feat_sbj_pos, sbj_labels_sbj_pos_fg, obj_labels_sbj_pos_fg, sbj_feat_sbj_pos, obj_feat_sbj_pos)
                 # obj
                 rel_feat_obj_pos = self.Prd_RCNN.Box_Head(blob_conv_prd, rel_ret, rois_name='rel_rois_obj_pos', use_relu=use_relu)
