@@ -17,7 +17,7 @@ We have created a branch for a version supporting pytorch1.0! Just go to the [py
 | Frequency \[1\]                |  VGG16            | 17.7     | 23.5     | 27.6      |
 | Frequency+Overlap \[1\]        |  VGG16            | 20.1     | 26.2     | 30.1      |
 | MotifNet \[1\]                 |  VGG16            | 21.4     | 27.2     | 30.3      |
-| Graph-RCNN \[2\]               |  Res-101          | 19.4	    | 25.0     |	28.5      |
+| Graph-RCNN \[2\]               |  Res-101          | 18.8	    | 23.7     |	26.2      |
 | RelDN, w/o contrastive losses  |  VGG16            | 20.8     | 28.1     | 32.5      |
 | RelDN, full                    |  VGG16            | 21.1     | 28.3     | 32.7      |
 | RelDN, full                    |  ResNext-101-FPN  | 22.5     | 31.0     | 36.7      |
