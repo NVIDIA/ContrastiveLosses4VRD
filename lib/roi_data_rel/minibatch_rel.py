@@ -8,6 +8,7 @@ import cv2
 from core.config import cfg
 import utils.blob as blob_utils
 import roi_data.rpn
+import roi_data.fast_rcnn
 
 
 def get_minibatch_blob_names(is_training=True):
