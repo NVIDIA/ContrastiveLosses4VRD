@@ -64,6 +64,8 @@ def eval_rel_results(all_results, output_dir, do_val):
                     det_labels_p_top = np.zeros(0, dtype=np.int32)
                     det_labels_o_top = np.zeros(0, dtype=np.int32)
                     det_scores_top = np.zeros(0, dtype=np.float32)
+                    det_boxes_so_top = np.zeros((0, 8), dtype=np.float32)
+                    det_labels_spo_top = np.zeros((0, 3), dtype=np.int32)
                 else:
                     det_boxes_sbj = res['sbj_boxes']  # (#num_rel, 4)
                     det_boxes_obj = res['obj_boxes']  # (#num_rel, 4)
