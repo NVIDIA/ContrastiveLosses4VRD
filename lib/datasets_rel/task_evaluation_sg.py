@@ -71,6 +71,8 @@ def eval_rel_results(all_results, output_dir, do_val=True, do_vis=False, do_spec
             det_labels_p_top = np.zeros(0, dtype=np.int32)
             det_labels_o_top = np.zeros(0, dtype=np.int32)
             det_scores_top = np.zeros(0, dtype=np.float32)
+            det_boxes_so_top = np.zeros((0, 8), dtype=np.float32)
+            det_labels_spo_top = np.zeros((0, 3), dtype=np.int32)
             
             det_scores_top_vis = np.zeros(0, dtype=np.float32)
             if 'prd_scores_bias' in res:
@@ -305,8 +307,7 @@ def _compute_pred_matches(gt_triplets, pred_triplets,
 
             gt_box_union = gt_box_union.astype(dtype=np.float32, copy=False)
             box_union = box_union.astype(dtype=np.float32, copy=False)
-            inds = bbox_overlaps(gt_box_union[None], 
-                                 box_union = box_union)[0] >= iou_thresh
+            inds = bbox_overlaps(gt_box_union[None], box_union)[0] >= iou_thresh
 
         else:
             gt_box = gt_box.astype(dtype=np.float32, copy=False)
