@@ -54,12 +54,11 @@ class RoiDataLoader(data.Dataset):
             obj_gt_boxes = entry['obj_gt_boxes']
             sbj_invalid = (sbj_gt_boxes[:, 0] == sbj_gt_boxes[:, 2]) | (sbj_gt_boxes[:, 1] == sbj_gt_boxes[:, 3])
             obj_invalid = (obj_gt_boxes[:, 0] == obj_gt_boxes[:, 2]) | (obj_gt_boxes[:, 1] == obj_gt_boxes[:, 3])
-            rel_valid = sbj_invalid | obj_invalid
+            rel_invalid = sbj_invalid | obj_invalid
             rel_valid_inds = np.nonzero(~ rel_invalid)[0]
             if len(rel_valid_inds) < len(sbj_gt_boxes):
                 for key in ['sbj_gt_boxes', 'sbj_gt_classes', 'obj_gt_boxes', 'obj_gt_classes', 'prd_gt_classes',
-                            'sbj_gt_overlaps', 'obj_gt_overlaps', 'prd_gt_overlaps', 'pair_to_gt_ind_map',
-                            'width', 'height']:
+                            'sbj_gt_overlaps', 'obj_gt_overlaps', 'prd_gt_overlaps', 'pair_to_gt_ind_map']:
                     if key in entry:
                         entry[key] = entry[key][rel_valid_inds]
 
