@@ -4,9 +4,9 @@
 <p align="center">Example results from the OpenImages dataset.</p>
 
 ![alt text](https://github.com/NVIDIA/ContrastiveLosses4VRD/blob/master/Loss_illustration.PNG)
-Example results of RelDN with without and with our losses. "L0 only" means using only the original multi-class logistic loss (without our losses). The top row shows RelDN outputs and the bottom row visualizes the learned predicate CNN features of the two models. Red and green boxes highlight the wrong and right outputs (the first row) or feature saliency (the second row).
+Example results of RelDN with and without our losses. "L0 only" means using only the original multi-class logistic loss (without our losses). The top row shows RelDN outputs and the bottom row visualizes the learned predicate CNN features of the two models. Red and green boxes highlight the wrong and right outputs (the first row) or feature saliency (the second row).
 
-This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Graph Parsing, CVPR2019](https://arxiv.org/abs/1903.02728). This is an improved version of the code that won the 1st place in the [Google AI Open Images Visual Relationship Detection Chanllenge](https://www.kaggle.com/c/google-ai-open-images-visual-relationship-track/leaderboard).
+This is a PyTorch implementation for [Graphical Contrastive Losses for Scene Graph Parsing, CVPR2019](https://arxiv.org/abs/1903.02728). This is an improved version of the code that won the 1st place in the [Google AI Open Images Visual Relationship Detection Challenge](https://www.kaggle.com/c/google-ai-open-images-visual-relationship-track/leaderboard).
 
 ## News
 We have created a branch for a version supporting pytorch1.0! Just go to the [pytorch1_0](https://github.com/NVIDIA/ContrastiveLosses4VRD/tree/pytorch1_0) branch and check it out!
