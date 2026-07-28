@@ -29,15 +29,19 @@ class GenerateRelProposalLabelsOp(nn.Module):
             output_blob_names += ['all_obj_labels_int32']
         if cfg.MODEL.USE_NODE_CONTRASTIVE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_SO_AWARE_LOSS or cfg.MODEL.USE_NODE_CONTRASTIVE_P_AWARE_LOSS:
             output_blob_names += ['binary_labels_sbj_pos_int32',
-                                  'sbj_rois_sbj_pos', 'obj_rois_sbj_pos', 'rel_rois_sbj_pos',
-                                  'spt_feat_sbj_pos',
+                                  'sbj_rois_sbj_pos', 'obj_rois_sbj_pos', 'rel_rois_sbj_pos']
+            if cfg.MODEL.USE_SPATIAL_FEAT:
+                output_blob_names += ['spt_feat_sbj_pos']
+            output_blob_names += [
                                   'sbj_labels_sbj_pos_int32', 'obj_labels_sbj_pos_int32', 'prd_labels_sbj_pos_int32',
                                   'sbj_labels_sbj_pos_fg_int32', 'obj_labels_sbj_pos_fg_int32',
                                   'inds_unique_sbj_pos',
                                   'inds_reverse_sbj_pos',
                                   'binary_labels_obj_pos_int32',
-                                  'sbj_rois_obj_pos', 'obj_rois_obj_pos', 'rel_rois_obj_pos',
-                                  'spt_feat_obj_pos',
+                                  'sbj_rois_obj_pos', 'obj_rois_obj_pos', 'rel_rois_obj_pos']
+            if cfg.MODEL.USE_SPATIAL_FEAT:
+                output_blob_names += ['spt_feat_obj_pos']
+            output_blob_names += [
                                   'sbj_labels_obj_pos_int32', 'obj_labels_obj_pos_int32', 'prd_labels_obj_pos_int32',
                                   'sbj_labels_obj_pos_fg_int32', 'obj_labels_obj_pos_fg_int32',
                                   'inds_unique_obj_pos',
