@@ -66,7 +66,7 @@ DATASETS = {
     },
     'oi_rel_val': {
         IM_DIR:
-            _DATA_DIR + '/openimages_v4/train',
+            _DATA_DIR + '/openimages_v4/validation',
         ANN_FN:
             _DATA_DIR + '/openimages_v4/rel/detections_val.json',
         ANN_FN2:
@@ -76,7 +76,7 @@ DATASETS = {
     },
     'oi_rel_val_mini': {
         IM_DIR:
-            _DATA_DIR + '/openimages_v4/train',
+            _DATA_DIR + '/openimages_v4/validation',
         ANN_FN:
             _DATA_DIR + '/openimages_v4/rel/detections_val.json',
         ANN_FN2:
