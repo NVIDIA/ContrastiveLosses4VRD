@@ -95,6 +95,7 @@ class reldn_head(nn.Module):
         prd_vis_scores = self.prd_cls_scores(prd_cls_feats)
         sbj_cls_scores = None
         obj_cls_scores = None
+        prd_bias_scores = None
             
         if cfg.MODEL.USE_FREQ_BIAS:
             assert sbj_labels is not None and obj_labels is not None
@@ -114,7 +115,7 @@ class reldn_head(nn.Module):
             prd_obj_scores = self.prd_obj_scores(obj_feat)
             
         if cfg.MODEL.ADD_SCORES_ALL:
-            ttl_cls_scores = torch.tensor(prd_vis_scores)
+            ttl_cls_scores = prd_vis_scores.clone()
             if cfg.MODEL.USE_FREQ_BIAS:
                 ttl_cls_scores += prd_bias_scores
             if cfg.MODEL.USE_SPATIAL_FEAT:
