@@ -550,8 +550,8 @@ def add_rel_proposals(roidb, sbj_rois, obj_rois, det_rois, scales):
             (sbj_rois[idx, 1:] * inv_im_scale, sbj_gt_boxes_paired_w_det, sbj_det_boxes_paired_w_gt, sbj_gt_boxes_paired_w_gt)))
         obj_box_list.append(np.concatenate(
             (obj_rois[idx, 1:] * inv_im_scale, obj_det_boxes_paired_w_gt, obj_gt_boxes_paired_w_det, obj_gt_boxes_paired_w_gt)))
-        _merge_paired_boxes_into_roidb(roidb, sbj_box_list, obj_box_list)
-        _add_prd_class_assignments(roidb)
+    _merge_paired_boxes_into_roidb(roidb, sbj_box_list, obj_box_list)
+    _add_prd_class_assignments(roidb)
     
     
 def _merge_paired_boxes_into_roidb(roidb, sbj_box_list, obj_box_list):
