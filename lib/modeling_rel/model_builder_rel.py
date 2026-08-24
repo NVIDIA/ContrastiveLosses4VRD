@@ -563,7 +563,7 @@ class Generalized_RCNN(nn.Module):
         det_rois = np.empty((0, 5), dtype=np.float32)
         det_labels = np.empty((0), dtype=np.float32)
         det_scores = np.empty((0), dtype=np.float32)
-        for im_i in range(cfg.TRAIN.IMS_PER_BATCH):
+        for im_i in range(im_info.shape[0]):
             # get all boxes that belong to this image
             inds = np.where(abs(rois[:, 0] - im_i) < 1e-06)[0]
             # unscale back to raw image space
@@ -596,7 +596,7 @@ class Generalized_RCNN(nn.Module):
                 box_deltas = box_deltas[:, -4:]
             if cfg.TRAIN.BBOX_NORMALIZE_TARGETS_PRECOMPUTED:
                 # (legacy) Optionally normalize targets by a precomputed mean and stdev
-                box_deltas = box_deltas.view(-1, 4) * cfg.TRAIN.BBOX_NORMALIZE_STDS \
+                box_deltas = box_deltas.reshape(-1, 4) * cfg.TRAIN.BBOX_NORMALIZE_STDS \
                              + cfg.TRAIN.BBOX_NORMALIZE_MEANS
             pred_boxes = box_utils.bbox_transform(boxes, box_deltas, cfg.MODEL.BBOX_REG_WEIGHTS)
             pred_boxes = box_utils.clip_tiled_boxes(pred_boxes, h_and_w)
@@ -607,9 +607,8 @@ class Generalized_RCNN(nn.Module):
             pred_boxes = np.tile(boxes, (1, scores.shape[1]))
 
         if cfg.DEDUP_BOXES > 0 and not cfg.MODEL.FASTER_RCNN:
-            # Map scores and predictions back to the original set of boxes
-            scores = scores[inv_index, :]
-            pred_boxes = pred_boxes[inv_index, :]
+            raise NotImplementedError(
+                'DEDUP_BOXES requires inv_index, which is not available here')
             
         return scores, pred_boxes
     
